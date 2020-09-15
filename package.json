@@ -1,0 +1,40 @@
+{
+  "name": "discord-support-tickets",
+  "version": "1.0.0",
+  "description": "A support tickets bot for Discord.",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/app.js",
+    "debug": "node ./src/app.js --debug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/greencoast-studios/discord-support-tickets.git"
+  },
+  "author": "Greencoast Studios",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/greencoast-studios/discord-support-tickets/issues"
+  },
+  "homepage": "https://github.com/greencoast-studios/discord-support-tickets#readme",
+  "engines": {
+    "node": ">=12.0"
+  },
+  "dependencies": {
+    "@greencoast/logger": "^1.0.1",
+    "discord.js": "^12.3.1",
+    "discord.js-commando": "^0.10.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
+    "babel-jest": "^26.3.0",
+    "eslint": "^7.9.0",
+    "eslint-config-greencoast": "0.0.2",
+    "jest": "^26.4.2",
+    "nodemon": "^2.0.4"
+  }
+}
