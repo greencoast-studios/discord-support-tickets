@@ -1,5 +1,5 @@
 ---
-name: ":zap: Feature Request"
+name: "Feature Request"
 about: Use this template to request a new feature or if you have a suggestion.
 labels: "Type: Feature Request"
 ---

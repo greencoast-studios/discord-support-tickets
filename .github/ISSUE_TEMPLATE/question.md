@@ -1,5 +1,5 @@
 ---
-name: ":question: Question"
+name: "Question"
 about: Use this template if you have any questions.
 labels: "Type: Question"
 ---

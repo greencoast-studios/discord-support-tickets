@@ -1,5 +1,5 @@
 ---
-name: ":bug: Bug Report"
+name: "Bug Report"
 about: Use this template to report a bug.
 labels: "Type: Bug"
 ---
