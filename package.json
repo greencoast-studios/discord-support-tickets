@@ -8,8 +8,9 @@
     "test:showlogs": "node_modules/.bin/jest --watchAll",
     "test:once": "node_modules/.bin/jest --silent",
     "test:once-showlogs": "node_modules/.bin/jest",
-    "start": "node_modules/.bin/babel-node ./src/app.js",
-    "debug": "node_modules/.bin/babel-node ./src/app.js --debug",
+    "build": "node_modules/.bin/babel src -d build",
+    "start": "node ./build/app.js",
+    "debug": "node ./build/app.js --debug",
     "dev": "nodemon --exec node_modules/.bin/babel-node ./src/app.js",
     "lint:errors-only": "node_modules/.bin/eslint src --quiet",
     "lint": "node_modules/.bin/eslint src"
