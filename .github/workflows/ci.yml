@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        node-version: [12.x, 14.x]
+
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Lint Files
+        run: npm run lint
+
+      - name: Run Tests
+        run: npm run test:once
+
+  build_push:
+    name: Build Docker Image and Push to GitHub Packages
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && needs.test.result == 'success' }}
+
+    steps:
+      - name: Checkout the Repository
+        uses: actions/checkout@v2
+
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: ${{ format('{0}/{1}', github.repository, 'discord_support_tickets') }}
+          tag_with_ref: true
