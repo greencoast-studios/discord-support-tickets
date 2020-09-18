@@ -8,12 +8,13 @@ class PingCommand extends Command {
       group: 'misc',
       description: 'Responds with Pong.',
       examples: [`${client.commandPrefix}ping`],
-      guildOnly: true
+      guildOnly: true,
+      argsType: 'multiple'
     });
   }
 
-  run(message) {
-    message.reply('Pong!');
+  run(message, args) {
+    message.reply(`Pong! - ${args[0]}`);
   }
 }
 
