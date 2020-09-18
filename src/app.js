@@ -5,6 +5,7 @@ import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
 import { dbFilePath, dbFileExists, createDatabaseFile } from './common/utils/data';
+import { guildSettingKeys } from './common/constants';
 
 const client = new CommandoClient({
   commandPrefix: prefix,
@@ -71,6 +72,16 @@ client.on('ready', () => {
 
 client.on('warn', (info) => {
   logger.warn(info);
+});
+
+client.on('commandError', (command, error, message) => {
+  logger.error(error);
+
+  if (client.provider.get(message.guild, guildSettingKeys.report, false)) {
+    client.owners.forEach((owner) => {
+      owner.send(`An error occurred when running the command **${command.name}** in **${message.guild.name}**. Triggering message: **${message.content}** \`\`\`${error.stack}\`\`\``);
+    });
+  }
 });
 
 client.login(discordToken);
