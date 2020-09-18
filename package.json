@@ -12,8 +12,8 @@
     "start": "node ./build/app.js",
     "debug": "node ./build/app.js --debug",
     "dev": "nodemon --exec node_modules/.bin/babel-node ./src/app.js",
-    "lint:errors-only": "node_modules/.bin/eslint src --quiet",
-    "lint": "node_modules/.bin/eslint src"
+    "lint:errors-only": "node_modules/.bin/eslint src test --quiet",
+    "lint": "node_modules/.bin/eslint src test"
   },
   "repository": {
     "type": "git",
