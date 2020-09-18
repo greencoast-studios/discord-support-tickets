@@ -1,7 +1,11 @@
-import { CommandoClient } from 'discord.js-commando';
+import { CommandoClient, SQLiteProvider } from 'discord.js-commando';
+import { open } from 'sqlite';
+import sqlite3 from 'sqlite3';
 import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
+import { dbFilePath, dbFileExists, createDatabaseFile } from './common/utils/data';
+import { guildSettingKeys } from './common/constants';
 
 const client = new CommandoClient({
   commandPrefix: prefix,
@@ -12,7 +16,8 @@ const client = new CommandoClient({
 client.registry
   .registerDefaultTypes()
   .registerGroups([
-    ['misc', 'Miscellaneous Commands']
+    ['misc', 'Miscellaneous Commands'],
+    ['owner-only', 'Owner-only Commands']
   ])
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
@@ -49,10 +54,34 @@ client.on('rateLimit', (info) => {
 
 client.on('ready', () => {
   logger.info('Connected to Discord! - Ready!');
+
+  if (!dbFileExists()) {
+    logger.warn('Database file not found, creating...');
+    createDatabaseFile();
+    logger.info('Database file created!');
+  }
+
+  open({
+    filename: dbFilePath,
+    driver: sqlite3.Database
+  }).then((db) => {
+    client.setProvider(new SQLiteProvider(db));
+    logger.info('Database loaded.');
+  });
 });
 
 client.on('warn', (info) => {
   logger.warn(info);
+});
+
+client.on('commandError', (command, error, message) => {
+  logger.error(error);
+
+  if (client.provider.get(message.guild, guildSettingKeys.report, false)) {
+    client.owners.forEach((owner) => {
+      owner.send(`An error occurred when running the command **${command.name}** in **${message.guild.name}**. Triggering message: **${message.content}** \`\`\`${error.stack}\`\`\``);
+    });
+  }
 });
 
 client.login(discordToken);

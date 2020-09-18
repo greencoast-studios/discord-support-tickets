@@ -108,3 +108,6 @@ build
 
 # Config file
 config/settings.json
+
+# Data folder
+data
