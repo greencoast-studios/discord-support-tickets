@@ -10,7 +10,7 @@ Can be used only by the owner.
 
 Run this command with the following message:
 
-``` tex
+``` text
 $log <toggle>
 ```
 
