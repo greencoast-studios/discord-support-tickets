@@ -1,3 +1,4 @@
 export const guildSettingKeys = {
-  log: 'log'
+  log: 'log',
+  report: 'report'
 };
