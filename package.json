@@ -45,6 +45,7 @@
     "eslint": "^7.9.0",
     "eslint-config-greencoast": "0.0.2",
     "jest": "^26.4.2",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "text-encoding": "^0.7.0"
   }
 }
