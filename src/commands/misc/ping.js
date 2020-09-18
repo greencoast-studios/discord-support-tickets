@@ -13,8 +13,8 @@ class PingCommand extends CustomCommand {
     });
   }
 
-  run(message, args) {
-    throw new Error('Oops!');
+  run(message, [text]) {
+    message.reply(`Pong! ${text}`);
   }
 }
 
