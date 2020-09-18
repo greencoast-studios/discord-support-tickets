@@ -10,6 +10,7 @@ class LogCommand extends CustomCommand {
       description: 'Enable or disable the logging of support channels.',
       examples: [`${client.commandPrefix}log enable`, `${client.commandPrefix}log disable`],
       guildOnly: false,
+      ownerOnly: true,
       argsType: 'multiple'
     });
   }

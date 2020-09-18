@@ -10,6 +10,7 @@ class ReportCommand extends CustomCommand {
       description: 'Enable or disable the reporting of errors to the owner.',
       examples: [`${client.commandPrefix}report enable`, `${client.commandPrefix}report disable`],
       guildOnly: false,
+      ownerOnly: true,
       argsType: 'multiple'
     });
   }
