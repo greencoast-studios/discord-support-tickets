@@ -1,7 +1,3 @@
----
-title: Installation
----
-
 You can install and use this bot in two different ways, either directly through Node.js or through the Docker Image.
 
 ## :green_book: Direct Node.js Installation

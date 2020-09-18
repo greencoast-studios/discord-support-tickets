@@ -1,7 +1,3 @@
----
-title: Development
----
-
 This section explains the development process for this project.
 
 ## :scroll: Scripts

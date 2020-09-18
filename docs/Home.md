@@ -1,7 +1,3 @@
----
-title: Home
----
-
 Welcome to the `discord-support-tickets` wiki. Here, you will find all sorts of information regarding this bot, from the installation process to a description and usage example of all the commands available.
 
 ## :pencil2: Description

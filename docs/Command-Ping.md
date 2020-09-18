@@ -1,7 +1,3 @@
----
-title: Command - Ping (TEMPLATE)
----
-
 > This page serves as a template to documentate commands. Remove any blockquotes at the beginning of each section.
 
 ## :pencil2: Description
