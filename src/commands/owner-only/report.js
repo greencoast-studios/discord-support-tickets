@@ -1,7 +1,7 @@
-import { Command } from 'discord.js-commando';
+import CustomCommand from '../../classes/extensions/CustomCommand';
 import { guildSettingKeys } from '../../common/constants';
 
-class ReportCommand extends Command {
+class ReportCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'report',

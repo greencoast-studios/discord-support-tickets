@@ -1,6 +1,6 @@
-import { Command } from 'discord.js-commando';
+import CustomCommand from '../../classes/extensions/CustomCommand';
 
-class PingCommand extends Command {
+class PingCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'ping',
@@ -14,7 +14,7 @@ class PingCommand extends Command {
   }
 
   run(message, args) {
-    message.reply(`Pong! - ${args[0]}`);
+    throw new Error('Oops!');
   }
 }
 
