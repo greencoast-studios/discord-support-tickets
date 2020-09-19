@@ -28,7 +28,7 @@ class SetCategoryCommand extends CustomCommand {
     }
 
     this.client.provider.set(message.guild, guildSettingKeys.channelCategory, category.id);
-    message.reply(`The channel category has been changed to ${category.name}.`);
+    message.reply(`The channel category has been changed to **${category.name}**.`);
   }
 
   run(message, [categoryID]) {

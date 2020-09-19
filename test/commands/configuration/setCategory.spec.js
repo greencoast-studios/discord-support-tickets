@@ -86,7 +86,7 @@ describe('Commands - SetCategory', () => {
       command.run(messageMock, [234]);
 
       expect(messageMock.reply.mock.calls.length).toBe(1);
-      expect(messageMock.reply.mock.calls[0][0]).toBe(`The channel category has been changed to ${channelMock.name}.`);
+      expect(messageMock.reply.mock.calls[0][0]).toBe(`The channel category has been changed to **${channelMock.name}**.`);
     });
   });
 });
