@@ -3,11 +3,17 @@ export const clientMock = {
   provider: {
     set: jest.fn(),
     get: jest.fn()
-  }
+  },
+  owners: [
+    {
+      send: jest.fn()
+    }
+  ]
 };
 
 export const messageMock = {
   reply: jest.fn(),
+  content: 'content',
   member: {
     displayName: 'user'
   },

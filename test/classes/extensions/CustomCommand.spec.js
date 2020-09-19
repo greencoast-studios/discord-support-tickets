@@ -1,17 +1,23 @@
 import logger from '@greencoast/logger';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
-import { messageMock } from '../../../__mocks__/discordMocks';
+import { clientMock, messageMock } from '../../../__mocks__/discordMocks';
 
 let command;
 
 const loggerInfoMock = jest.spyOn(logger, 'info');
+const loggerErrorMock = jest.spyOn(logger, 'error');
 
 describe('Classes - Extensions - CustomCommand', () => {
   beforeEach(() => {
     messageMock.reply.mockClear();
     loggerInfoMock.mockClear();
+    loggerErrorMock.mockClear();
+    clientMock.provider.get.mockClear();
+    clientMock.owners.forEach((owner) => {
+      owner.send.mockClear();
+    });
 
-    command = new CustomCommand({}, {
+    command = new CustomCommand(clientMock, {
       name: 'command',
       group: 'group',
       memberName: 'group',
@@ -24,6 +30,32 @@ describe('Classes - Extensions - CustomCommand', () => {
       command.onError(new Error(), messageMock);
       expect(messageMock.reply.mock.calls.length).toBe(1);
       expect(messageMock.reply.mock.calls[0][0]).toBe('Something wrong happened when executing this command.');
+    });
+
+    it('should log the error with error level logger.', () => {
+      const error = new Error();
+      command.onError(error, messageMock);
+      expect(loggerErrorMock.mock.calls.length).toBe(1);
+      expect(loggerErrorMock.mock.calls[0][0]).toBe(error);
+    });
+
+    it('should send a message to the owner if enabled.', () => {
+      const error = new Error();
+      clientMock.provider.get.mockImplementation(() => true);
+      command.onError(error, messageMock);
+      clientMock.owners.forEach((owner) => {
+        expect(owner.send.mock.calls.length).toBe(1);
+        expect(owner.send.mock.calls[0][0]).toBe(`An error occurred when running the command **${command.name}** in **${messageMock.guild.name}**. Triggering message: **${messageMock.content}** \`\`\`${error.stack}\`\`\``);
+      });
+    });
+
+    it('should not send a message to the owner if disabled.', () => {
+      const error = new Error();
+      clientMock.provider.get.mockImplementation(() => false);
+      command.onError(error, messageMock);
+      clientMock.owners.forEach((owner) => {
+        expect(owner.send.mock.calls.length).toBe(0);
+      });
     });
   });
 
