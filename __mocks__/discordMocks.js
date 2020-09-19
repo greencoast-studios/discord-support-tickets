@@ -19,5 +19,7 @@ export const messageMock = {
 
 export const channelMock = {
   name: 'name',
-  id: 123
+  id: 123,
+  manageable: true,
+  viewable: true
 };

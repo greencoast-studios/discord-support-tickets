@@ -22,6 +22,11 @@ class SetCategoryCommand extends CustomCommand {
       return;
     }
 
+    if (!category.manageable) {
+      message.reply("I don't have the required permissions to manage this channel category. Please change my permissions to access it or use another channel category.");
+      return;
+    }
+
     this.client.provider.set(message.guild, guildSettingKeys.channelCategory, category.id);
     message.reply(`The channel category has been changed to ${category.name}.`);
   }

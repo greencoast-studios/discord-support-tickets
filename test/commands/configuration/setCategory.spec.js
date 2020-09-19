@@ -1,7 +1,7 @@
 import SetCategoryCommand from '../../../src/commands/configuration/setCategory';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock, channelMock } from '../../../__mocks__/discordMocks';
-import{ guildSettingKeys } from '../../../src/common/constants';
+import { guildSettingKeys } from '../../../src/common/constants';
 
 let command;
 
@@ -34,6 +34,7 @@ describe('Commands - SetCategory', () => {
     beforeEach(() => {
       command = new SetCategoryCommand(clientMock);
       messageMock.reply.mockClear();
+      clientMock.provider.set.mockClear();
     });
 
     it('should reply with category not found for id that does not exist.', () => {
@@ -54,6 +55,18 @@ describe('Commands - SetCategory', () => {
       expect(messageMock.reply.mock.calls[0][0]).toBe('This channel category was already set.');
     });
 
+    it('should reply with not enough permissions if category is not manageable.', () => {
+      messageMock.guild.channels.cache.find.mockImplementation(() => (
+        { ...channelMock, manageable: false }
+      ));
+      clientMock.provider.get.mockImplementation(() => 123123);
+      command = new SetCategoryCommand(clientMock);
+      command.run(messageMock, [234]);
+
+      expect(messageMock.reply.mock.calls.length).toBe(1);
+      expect(messageMock.reply.mock.calls[0][0]).toBe("I don't have the required permissions to manage this channel category. Please change my permissions to access it or use another channel category.");
+    });
+
     it('should save the category id to the db if a new value was provided.', () => {
       messageMock.guild.channels.cache.find.mockImplementation(() => channelMock);
       clientMock.provider.get.mockImplementation(() => 123123); // not what channelMock.id has.
@@ -68,7 +81,7 @@ describe('Commands - SetCategory', () => {
 
     it('should reply with the category changed message if a new value was provided.', () => {
       messageMock.guild.channels.cache.find.mockImplementation(() => channelMock);
-      clientMock.provider.get.mockImplementation(() => 234);
+      clientMock.provider.get.mockImplementation(() => 123123);
       command = new SetCategoryCommand(clientMock);
       command.run(messageMock, [234]);
 
