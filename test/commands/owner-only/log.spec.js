@@ -1,25 +1,19 @@
 import LogCommand from '../../../src/commands/owner-only/log';
+import CustomCommand from '../../../src/classes/extensions/CustomCommand';
+import { clientMock, messageMock } from '../../../__mocks__/discordMocks';
 
 let command;
-
-const clientMock = {
-  commandPrefix: '$',
-  provider: {
-    set: jest.fn(),
-    get: jest.fn()
-  }
-};
-
-const messageMock = {
-  reply: jest.fn(),
-  guild: 'guild'
-};
 
 describe('Commands - Log', () => {
   afterEach(() => {
     messageMock.reply.mockClear();
     clientMock.provider.get.mockClear();
     clientMock.provider.set.mockClear();
+  });
+
+  it('should be instance of CustomCommand.', () => {
+    command = new LogCommand(clientMock);
+    expect(command).toBeInstanceOf(CustomCommand);
   });
 
   describe('Arg: No args', () => {
