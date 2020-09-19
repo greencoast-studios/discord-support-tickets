@@ -13,6 +13,11 @@ export const messageMock = {
       cache: {
         find: jest.fn()
       }
+    },
+    roles: {
+      cache: {
+        find: jest.fn()
+      }
     }
   }
 };
@@ -22,4 +27,10 @@ export const channelMock = {
   id: 123,
   manageable: true,
   viewable: true
+};
+
+export const roleMock = {
+  name: 'name',
+  id: '123',
+  mentionable: true
 };
