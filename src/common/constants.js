@@ -1,4 +1,5 @@
 export const guildSettingKeys = {
   log: 'log',
-  report: 'report'
+  report: 'report',
+  channelCategory: 'channel-category'
 };

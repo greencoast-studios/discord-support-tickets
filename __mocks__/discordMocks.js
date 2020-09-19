@@ -8,5 +8,16 @@ export const clientMock = {
 
 export const messageMock = {
   reply: jest.fn(),
-  guild: 'guild'
+  guild: {
+    channels: {
+      cache: {
+        find: jest.fn()
+      }
+    }
+  }
+};
+
+export const channelMock = {
+  name: 'name',
+  id: 123
 };

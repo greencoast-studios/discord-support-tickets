@@ -17,7 +17,8 @@ client.registry
   .registerDefaultTypes()
   .registerGroups([
     ['misc', 'Miscellaneous Commands'],
-    ['owner-only', 'Owner-only Commands']
+    ['owner-only', 'Owner-only Commands'],
+    ['configuration', 'Configuration Commands']
   ])
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
