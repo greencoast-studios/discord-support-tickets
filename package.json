@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@greencoast/logger": "^1.0.1",
+    "axios": "^0.20.0",
     "discord.js": "^12.3.1",
     "discord.js-commando": "github:discordjs/Commando",
     "sqlite": "^4.0.14",

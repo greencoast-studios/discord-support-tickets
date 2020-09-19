@@ -11,29 +11,32 @@ export const clientMock = {
   ]
 };
 
+export const guildMock = {
+  channels: {
+    cache: {
+      find: jest.fn()
+    }
+  },
+  roles: {
+    cache: {
+      find: jest.fn()
+    }
+  },
+  id: '123'
+};
+
 export const messageMock = {
   reply: jest.fn(),
   content: 'content',
   member: {
     displayName: 'user'
   },
-  guild: {
-    channels: {
-      cache: {
-        find: jest.fn()
-      }
-    },
-    roles: {
-      cache: {
-        find: jest.fn()
-      }
-    }
-  }
+  guild: guildMock
 };
 
 export const channelMock = {
   name: 'name',
-  id: 123,
+  id: '123',
   manageable: true,
   viewable: true
 };

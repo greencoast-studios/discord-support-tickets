@@ -1,17 +1,40 @@
 /* eslint-disable prefer-destructuring */
 import fs from 'fs';
-import { dbFilePath, dataFolder } from '../../../src/common/utils/data';
+import path from 'path';
+import logger from '@greencoast/logger';
+import axios, { getResolvedMock, getRejectedMock } from 'axios';
+import Stream from 'stream';
+import { dbFilePath, dataFolder, imageFolder } from '../../../src/common/utils/data';
+import { guildMock } from '../../../__mocks__/discordMocks';
 
-let dbFileExists, createDatabaseFile;
+let dbFileExists,
+  createDatabaseFile,
+  imageDirectoryExists,
+  createImageDirectory,
+  downloadImage,
+  saveImage,
+  getImageFile,
+  removeImage;
 
 const existsSyncMock = jest.spyOn(fs, 'existsSync');
 const mkdirSyncMock = jest.spyOn(fs, 'mkdirSync');
 const writeFileSyncMock = jest.spyOn(fs, 'writeFileSync');
+const createWriteStreamMock = jest.spyOn(fs, 'createWriteStream');
+const readdirMock = jest.spyOn(fs, 'readdir');
+const unlinkMock = jest.spyOn(fs, 'unlink');
+
+const loggerDebugMock = jest.spyOn(logger, 'debug');
 
 describe('Common - Utils - Data', () => {
   describe('dataFolder', () => {
     it('should be a string.', () => {
       expect(typeof dataFolder).toBe('string');
+    });
+  });
+
+  describe('imageFolder', () => {
+    it('should be a string.', () => {
+      expect(typeof imageFolder).toBe('string');
     });
   });
 
@@ -43,6 +66,24 @@ describe('Common - Utils - Data', () => {
     });
   });
 
+  describe('imageDirectoryExists()', () => {
+    it('should return true if directory exists.', () => {
+      existsSyncMock.mockImplementation(() => true);
+      jest.resetModules();
+      imageDirectoryExists = require('../../../src/common/utils/data').imageDirectoryExists;
+
+      expect(imageDirectoryExists()).toBe(true);
+    });
+
+    it('should return false if the directory does not exist.', () => {
+      existsSyncMock.mockImplementation(() => false);
+      jest.resetModules();
+      imageDirectoryExists = require('../../../src/common/utils/data').imageDirectoryExists;
+      
+      expect(imageDirectoryExists()).toBe(false);
+    });
+  });
+
   describe('createDatabaseFile()', () => {
     beforeAll(() => {
       mkdirSyncMock.mockImplementation();
@@ -68,6 +109,238 @@ describe('Common - Utils - Data', () => {
       expect(writeFileSyncMock.mock.calls.length).toBe(1);
       expect(writeFileSyncMock.mock.calls[0][0]).toBe(dbFilePath);
       expect(writeFileSyncMock.mock.calls[0][1]).toBe('');
+    });
+  });
+
+  describe('createImageDirectory()', () => {
+    beforeAll(() => {
+      mkdirSyncMock.mockImplementation();
+
+      jest.resetModules();
+      createImageDirectory = require('../../../src/common/utils/data').createImageDirectory;
+    });
+
+    beforeEach(() => {
+      mkdirSyncMock.mockClear();
+    });
+
+    it('should call fs.mkdirSync with imageFolder.', () => {
+      createImageDirectory();
+      expect(mkdirSyncMock.mock.calls.length).toBe(1);
+      expect(mkdirSyncMock.mock.calls[0][0]).toBe(imageFolder);
+    });
+  });
+
+  describe('downloadImage()', () => {
+    beforeAll(() => {
+      jest.resetModules();
+      downloadImage = require('../../../src/common/utils/data').downloadImage;
+    });
+
+    beforeEach(() => {
+      axios.get.mockClear();
+      loggerDebugMock.mockClear();
+    });
+
+    it('should return a Promise.', () => {
+      expect(downloadImage('')).toBeInstanceOf(Promise);
+    });
+
+    it('should resolve an object with keys data and extension.', () => {
+      downloadImage('')
+        .then((resolved) => {
+          expect(resolved.data).not.toBeUndefined();
+          expect(resolved.extension).not.toBeUndefined();
+          expect(resolved.data).toBeInstanceOf(Stream);
+          expect(typeof resolved.extension).toBe('string');
+        });
+    });
+
+    it('should debug log if debug flag is enabled when rejected.', () => {
+      const oldArgv = [...process.argv];
+      process.argv = ['npm', 'start', '--debug'];
+      axios.get.mockImplementation(getRejectedMock);
+      jest.resetModules();
+      downloadImage = require('../../../src/common/utils/data').downloadImage;
+      
+      downloadImage('')
+        .catch((rejected) => {
+          expect(loggerDebugMock.mock.calls.length).toBe(1);
+          expect(loggerDebugMock.mock.calls[0][0]).toBe(rejected.response);
+
+          axios.get.mockImplementation(getResolvedMock);
+          process.argv = oldArgv;
+          jest.resetModules();
+          downloadImage = require('../../../src/common/utils/data').downloadImage;
+        });
+    });
+  });
+
+  describe('saveImage()', () => {
+    beforeAll(() => {
+      jest.resetModules();
+      saveImage = require('../../../src/common/utils/data').saveImage;
+    });
+
+    beforeEach(() => {
+      createWriteStreamMock.mockClear();
+    });
+
+    it('should return a Promise.', () => {
+      expect(saveImage(guildMock, '')).toBeInstanceOf(Promise);
+    });
+
+    it('should resolve an object with data and extension keys.', () => {
+      saveImage(guildMock, '')
+        .then((resolved) => {
+          expect(resolved.data).not.toBeUndefined();
+          expect(resolved.extension).not.toBeUndefined();
+          expect(resolved.data).toBeInstanceOf(Stream);
+          expect(typeof resolved.extension).toBe('string');
+        });
+    });
+
+    it('should should call fs.createWriteStream with the proper arguments when resolved.', () => {
+      saveImage(guildMock, '')
+        .then((resolved) => {
+          expect(createWriteStreamMock.mock.calls.length).toBe(1);
+          expect(createWriteStreamMock.mock.calls[0][0]).toBe(path.join(imageFolder, `${guildMock.id}.${resolved.extension}`));
+        });
+    });
+
+    it('should call data.pipe with an instance of fs.WriteStream.', () => {
+      saveImage(guildMock, '')
+        .then((resolved) => {
+          expect(resolved.data.pipe.mock.calls.length).toBe(1);
+          expect(resolved.data.pipe.mock.calls[0][0]).toBeInstanceOf(fs.WriteStream);
+        });
+    });
+  });
+
+  describe('getImageFile()', () => {
+    beforeAll(() => {
+      jest.resetModules();
+      getImageFile = require('../../../src/common/utils/data').getImageFile;
+    });
+
+    beforeEach(() => {
+      readdirMock.mockClear();
+    });
+
+    it('should return a Promise.', () => {
+      expect(getImageFile(guildMock)).toBeInstanceOf(Promise);
+    });
+
+    it('should call fs.readdir once with the path of the image folder.', () => {
+      getImageFile(guildMock);
+
+      expect(readdirMock.mock.calls.length).toBe(1);
+      expect(readdirMock.mock.calls[0][0]).toBe(imageFolder);
+    });
+
+    it('should resolve with a filename if image is found.', () => {
+      readdirMock.mockImplementationOnce((path, cb) => cb(null, [`${guildMock.id}`]));
+
+      getImageFile(guildMock)
+        .then((resolved) => {
+          expect(resolved).toBe(path.resolve(imageFolder, `${guildMock.id}`));
+        });
+    });
+
+    it('should resolve with null if image is not found.', () => {
+      readdirMock.mockImplementationOnce((path, cb) => cb(null, []));
+
+      getImageFile(guildMock)
+        .then((resolved) => {
+          expect(resolved).toBeNull();
+        });
+    });
+
+    it('should reject if error was found in fs.readdir.', () => {
+      const error = new Error();
+      readdirMock.mockImplementationOnce((path, cb) => cb(error, []));
+
+      getImageFile(guildMock)
+        .catch((rejected) => {
+          expect(rejected).toBe(error);
+        });
+    });
+  });
+
+  describe('removeImage()', () => {
+    beforeAll(() => {
+      unlinkMock.mockImplementation(() => new Promise((resolve) => resolve()));
+
+      jest.resetModules();
+      removeImage = require('../../../src/common/utils/data').removeImage;
+    });
+
+    beforeEach(() => {
+      readdirMock.mockClear();
+      unlinkMock.mockClear();
+    });
+
+    it('should return a Promise.', () => {
+      expect(removeImage(guildMock)).toBeInstanceOf(Promise);
+    });
+
+    it('should call fs.readdir once with the path of the image folder.', () => {
+      removeImage(guildMock);
+
+      expect(readdirMock.mock.calls.length).toBe(1);
+      expect(readdirMock.mock.calls[0][0]).toBe(imageFolder);
+    });
+
+    it('should resolve with false if image is not found.', () => {
+      readdirMock.mockImplementation((path, cb) => cb(null, ['999'])); // not guildMock.id
+
+      removeImage(guildMock)
+        .then((resolved) => {
+          expect(resolved).toBe(false);
+        });
+    });
+
+    it('should resolve with true if image is found.', () => {
+      readdirMock.mockImplementation((path, cb) => cb(null, [`${guildMock.id}`]));
+
+      removeImage(guildMock)
+        .then((resolved) => {
+          expect(resolved).toBe(true);
+        });
+    });
+
+    it('should reject if error was found in fs.readdir.', () => {
+      const error = new Error();
+      readdirMock.mockImplementation((path, cb) => cb(error, []));
+
+      removeImage(guildMock)
+        .catch((rejected) => {
+          expect(rejected).toBe(error);
+        });
+    });
+
+    it('should call fs.unlink with the image path as first argument if image was found.', () => {
+      readdirMock.mockImplementation((path, cb) => cb(null, [`${guildMock.id}`]));
+
+      removeImage(guildMock);
+      expect(unlinkMock.mock.calls.length).toBe(1);
+    });
+
+    it('should not call fs.unlink if image was not found.', () => {
+      readdirMock.mockImplementation((path, cb) => cb(null, ['999'])); // not guildMock.id
+
+      removeImage(guildMock);
+      expect(unlinkMock.mock.calls.length).toBe(0);
+    });
+
+    it('should reject if error was found in fs.readdir.', () => {
+      const error = new Error();
+      unlinkMock.mockImplementation((path, cb) => cb(error));
+
+      removeImage(guildMock)
+        .catch((rejected) => {
+          expect(rejected).toBe(error);
+        });
     });
   });
 });
