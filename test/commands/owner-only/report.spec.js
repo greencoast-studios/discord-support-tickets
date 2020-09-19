@@ -1,11 +1,14 @@
+import logger from '@greencoast/logger';
 import ReportCommand from '../../../src/commands/owner-only/report';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock } from '../../../__mocks__/discordMocks';
 
 let command;
 
+const loggerInfoMock = jest.spyOn(logger, 'info');
+
 describe('Commands - Report', () => {
-  afterEach(() => {
+  beforeEach(() => {
     messageMock.reply.mockClear();
     clientMock.provider.get.mockClear();
     clientMock.provider.set.mockClear();
@@ -14,6 +17,12 @@ describe('Commands - Report', () => {
   it('should be instance of CustomCommand.', () => {
     command = new ReportCommand(clientMock);
     expect(command).toBeInstanceOf(CustomCommand);
+  });
+
+  it('should call logger.info with the proper message.', () => {
+    command.run(messageMock, []);
+    expect(loggerInfoMock.mock.calls.length).toBe(1);
+    expect(loggerInfoMock.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
   });
 
   describe('Arg: No args', () => {

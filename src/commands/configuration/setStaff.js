@@ -1,3 +1,4 @@
+import logger from '@greencoast/logger';
 import CustomCommand from '../../classes/extensions/CustomCommand';
 import { guildSettingKeys } from '../../common/constants';
 import { parseMention } from '../../common/utils/helpers';
@@ -30,9 +31,12 @@ class SetStaffCommand extends CustomCommand {
 
     this.client.provider.set(message.guild, guildSettingKeys.staffRole, role.id);
     message.reply(`I will now ping **${role.name}** when creating the ticket channels.`);
+    logger.info(`Changed staff role for ${message.guild.name} to ${role.name}.`);
   }
 
   run(message, [roleMention]) {
+    super.run(message);
+
     if (!roleMention) {
       message.reply('You need to mention a role along with this command.');
       return;

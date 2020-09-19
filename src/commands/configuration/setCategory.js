@@ -1,3 +1,4 @@
+import logger from '@greencoast/logger';
 import CustomCommand from '../../classes/extensions/CustomCommand';
 import { guildSettingKeys } from '../../common/constants';
 
@@ -29,9 +30,12 @@ class SetCategoryCommand extends CustomCommand {
 
     this.client.provider.set(message.guild, guildSettingKeys.channelCategory, category.id);
     message.reply(`The channel category has been changed to **${category.name}**.`);
+    logger.info(`Changed channel category for ${message.guild.name} to ${category.name}.`);
   }
 
   run(message, [categoryID]) {
+    super.run(message);
+    
     if (!categoryID) {
       message.reply('A channel ID must be provided to this command.');
       return;

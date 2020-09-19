@@ -1,3 +1,4 @@
+import logger from '@greencoast/logger';
 import SetCategoryCommand from '../../../src/commands/configuration/setCategory';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock, channelMock } from '../../../__mocks__/discordMocks';
@@ -5,14 +6,22 @@ import { guildSettingKeys } from '../../../src/common/constants';
 
 let command;
 
+const loggerInfoMock = jest.spyOn(logger, 'info');
+
 describe('Commands - SetCategory', () => {
-  afterAll(() => {
+  beforeEach(() => {
     messageMock.reply.mockClear();
   });
 
   it('should be instance of CustomCommand.', () => {
     command = new SetCategoryCommand(clientMock);
     expect(command).toBeInstanceOf(CustomCommand);
+  });
+
+  it('should call logger.info with the proper message.', () => {
+    command.run(messageMock, []);
+    expect(loggerInfoMock.mock.calls.length).toBe(1);
+    expect(loggerInfoMock.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
   });
 
   describe('Arg: No args', () => {

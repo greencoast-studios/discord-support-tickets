@@ -1,3 +1,4 @@
+import logger from '@greencoast/logger';
 import SetStaffCommand from '../../../src/commands/configuration/setStaff';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock, roleMock } from '../../../__mocks__/discordMocks';
@@ -5,14 +6,23 @@ import { guildSettingKeys } from '../../../src/common/constants';
 
 let command;
 
+const loggerInfoMock = jest.spyOn(logger, 'info');
+
 describe('Commands - SetStaff', () => {
-  afterAll(() => {
+  beforeEach(() => {
     messageMock.reply.mockClear();
+    loggerInfoMock.mockClear();
   });
 
   it('should be instance of CustomCommand.', () => {
     command = new SetStaffCommand(clientMock);
     expect(command).toBeInstanceOf(CustomCommand);
+  });
+
+  it('should call logger.info with the proper message.', () => {
+    command.run(messageMock, []);
+    expect(loggerInfoMock.mock.calls.length).toBe(1);
+    expect(loggerInfoMock.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
   });
 
   describe('Arg: No args', () => {

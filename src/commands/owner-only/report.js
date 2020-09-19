@@ -1,3 +1,4 @@
+import logger from '@greencoast/logger';
 import CustomCommand from '../../classes/extensions/CustomCommand';
 import { guildSettingKeys } from '../../common/constants';
 
@@ -25,6 +26,7 @@ class ReportCommand extends CustomCommand {
 
     this.client.provider.set(message.guild, guildSettingKeys.report, true);
     message.reply('Error reporting is now enabled. Error stacks will be sent to you via DM.');
+    logger.info(`Error reporting has been enabled for ${message.guild.name}.`);
   }
 
   handleDisable(message) {
@@ -37,9 +39,12 @@ class ReportCommand extends CustomCommand {
 
     this.client.provider.set(message.guild, guildSettingKeys.report, false);
     message.reply('Error reporting is now disabled. You will not receive error stacks anymore.');
+    logger.info(`Error reporting has been disabled for ${message.guild.name}.`);
   }
 
   run(message, [option]) {
+    super.run(message);
+
     if (option === 'enable') {
       return this.handleEnable(message);
     }
