@@ -28,12 +28,18 @@ export const guildMock = {
 
 export const messageMock = {
   reply: jest.fn(),
+  id: '123',
   content: 'content',
   member: {
     displayName: 'user'
   },
   guild: guildMock,
-  say: jest.fn()
+  say: jest.fn(),
+  channel: {
+    messages: {
+      fetch: jest.fn()
+    }
+  }
 };
 
 export const channelMock = {
