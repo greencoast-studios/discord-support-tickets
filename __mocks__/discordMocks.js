@@ -22,7 +22,8 @@ export const guildMock = {
       find: jest.fn()
     }
   },
-  id: '123'
+  id: '123',
+  name: 'guildName'
 };
 
 export const messageMock = {
@@ -31,7 +32,8 @@ export const messageMock = {
   member: {
     displayName: 'user'
   },
-  guild: guildMock
+  guild: guildMock,
+  say: jest.fn()
 };
 
 export const channelMock = {
