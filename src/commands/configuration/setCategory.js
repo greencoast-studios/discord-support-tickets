@@ -11,7 +11,8 @@ class SetCategoryCommand extends CustomCommand {
       description: 'Set the category under which the channels will be created.',
       examples: [`${client.commandPrefix}setcategory <channel_id>`],
       guildOnly: true,
-      argsType: 'multiple'
+      argsType: 'multiple',
+      userPermissions: ['MANAGE_CHANNELS']
     });
   }
 

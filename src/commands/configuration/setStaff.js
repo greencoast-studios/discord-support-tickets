@@ -12,7 +12,8 @@ class SetStaffCommand extends CustomCommand {
       description: 'Set the staff role that will be pinged when starting a ticket.',
       examples: [`${client.commandPrefix}setstaff <staff_mention>`],
       guildOnly: true,
-      argsType: 'multiple'
+      argsType: 'multiple',
+      userPermissions: ['MANAGE_ROLES']
     });
   }
 

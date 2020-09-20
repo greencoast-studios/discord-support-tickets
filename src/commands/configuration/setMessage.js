@@ -12,7 +12,8 @@ class SetMessageCommand extends CustomCommand {
       description: 'Set the message that will be used to handle ticket creation.',
       examples: [`${client.commandPrefix}setmessage <message_id>`],
       guildOnly: true,
-      argsType: 'multiple'
+      argsType: 'multiple',
+      userPermissions: ['MANAGE_MESSAGES']
     });
   }
 

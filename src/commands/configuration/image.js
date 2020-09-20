@@ -12,7 +12,8 @@ class ImageCommand extends CustomCommand {
       description: 'Set the image that will be sent to the newly created channel.',
       examples: [`${client.commandPrefix}image set <image_attachment>`, `${client.commandPrefix}image remove`, `${client.commandPrefix}image`],
       guildOnly: true,
-      argsType: 'multiple'
+      argsType: 'multiple',
+      userPermissions: ['MANAGE_MESSAGES']
     });
   }
 
