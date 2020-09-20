@@ -25,6 +25,7 @@ export const createImageDirectory = () => {
 };
 
 export const downloadImage = (imageURL) => {
+  logger.debug('hi')
   return axios.get(imageURL, { responseType: 'stream' })
     .then((response) => {
       const urlAsArray = response.config.url.split('.');

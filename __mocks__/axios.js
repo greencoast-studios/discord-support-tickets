@@ -8,26 +8,29 @@ export const successfulResponseMock = {
 };
 
 export const failedResponseMock = {
-  response: {}
+  response: {
+    status: 500
+  }
 };
 
-export const getResolvedMock = (url, options) => {
-  return new Promise((resolve, reject) => {
-    resolve({
-      ...successfulResponseMock,
-      data: options.responseType === 'stream' ? new Stream() : {}
-    });
-  });
-};
+export const getResolvedMock = (url, options) => Promise.resolve(
+  {
+    ...successfulResponseMock,
+    data: options.responseType === 'stream' ? new Stream() : {}
+  }
+);
 
-export const getRejectedMock = (url, options) => {
-  return new Promise((resolve, reject) => {
-    reject({
-      ...failedResponseMock
-    });
-  });
-};
+export const getRejectedMock = (url, options) => Promise.reject(
+  {
+    ...failedResponseMock
+  }
+);
 
 export default {
-  get: jest.fn(getResolvedMock)
+  get: jest.fn((url, options) => {
+    if (url === 'invalid') {
+      return getRejectedMock(url, options);
+    }
+    return getResolvedMock(url, options);
+  })
 };

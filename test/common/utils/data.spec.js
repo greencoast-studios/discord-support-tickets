@@ -1,8 +1,7 @@
 /* eslint-disable prefer-destructuring */
 import fs from 'fs';
 import path from 'path';
-import logger from '@greencoast/logger';
-import axios, { getResolvedMock, getRejectedMock } from 'axios';
+import axios from 'axios';
 import Stream from 'stream';
 import { dbFilePath, dataFolder, imageFolder } from '../../../src/common/utils/data';
 import { guildMock } from '../../../__mocks__/discordMocks';
@@ -23,7 +22,11 @@ const createWriteStreamMock = jest.spyOn(fs, 'createWriteStream');
 const readdirMock = jest.spyOn(fs, 'readdir');
 const unlinkMock = jest.spyOn(fs, 'unlink');
 
-const loggerDebugMock = jest.spyOn(logger, 'debug');
+jest.mock('@greencoast/logger', () => {
+  return {
+    debug: jest.fn()
+  };
+});
 
 describe('Common - Utils - Data', () => {
   describe('dataFolder', () => {
@@ -139,7 +142,6 @@ describe('Common - Utils - Data', () => {
 
     beforeEach(() => {
       axios.get.mockClear();
-      loggerDebugMock.mockClear();
     });
 
     it('should return a Promise.', () => {
@@ -154,24 +156,6 @@ describe('Common - Utils - Data', () => {
           expect(resolved.data).toBeInstanceOf(Stream);
           expect(typeof resolved.data.pipe).toBe('function');
           expect(typeof resolved.extension).toBe('string');
-        });
-    });
-
-    it('should debug log if debug flag is enabled when rejected.', () => {
-      const oldArgv = [...process.argv];
-      process.argv = ['npm', 'start', '--debug'];
-      axios.get.mockImplementationOnce(getRejectedMock);
-      jest.resetModules();
-      downloadImage = require('../../../src/common/utils/data').downloadImage;
-      
-      return downloadImage('')
-        .catch((rejected) => {
-          expect(loggerDebugMock.mock.calls.length).toBe(1);
-          expect(loggerDebugMock.mock.calls[0][0]).toBe(rejected.response);
-
-          process.argv = oldArgv;
-          jest.resetModules();
-          downloadImage = require('../../../src/common/utils/data').downloadImage;
         });
     });
   });
@@ -254,6 +238,7 @@ describe('Common - Utils - Data', () => {
     it('should reject if error was found in fs.readdir.', () => {
       const error = new Error();
       readdirMock.mockImplementationOnce((path, cb) => cb(error, []));
+      expect.assertions(1);
 
       return getImageFile(guildMock)
         .catch((rejected) => {
@@ -310,6 +295,7 @@ describe('Common - Utils - Data', () => {
     it('should reject if error was found in fs.readdir.', () => {
       const error = new Error();
       readdirMock.mockImplementation((path, cb) => cb(error, []));
+      expect.assertions(1);
 
       return removeImage(guildMock)
         .catch((rejected) => {
@@ -339,7 +325,9 @@ describe('Common - Utils - Data', () => {
 
     it('should reject if error was found in fs.readdir.', () => {
       const error = new Error();
+      readdirMock.mockImplementation((path, cb) => cb(null, [`${guildMock.id}`]));
       unlinkMock.mockImplementation((path, cb) => cb(error));
+      expect.assertions(1);
 
       return removeImage(guildMock)
         .catch((rejected) => {
