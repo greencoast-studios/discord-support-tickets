@@ -5,7 +5,6 @@ import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
 import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory } from './common/utils/data';
-import { guildSettingKeys } from './common/constants';
 
 const client = new CommandoClient({
   commandPrefix: prefix,
