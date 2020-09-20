@@ -147,11 +147,12 @@ describe('Common - Utils - Data', () => {
     });
 
     it('should resolve an object with keys data and extension.', () => {
-      downloadImage('')
+      return downloadImage('')
         .then((resolved) => {
           expect(resolved.data).not.toBeUndefined();
           expect(resolved.extension).not.toBeUndefined();
           expect(resolved.data).toBeInstanceOf(Stream);
+          expect(typeof resolved.data.pipe).toBe('function');
           expect(typeof resolved.extension).toBe('string');
         });
     });
@@ -159,16 +160,15 @@ describe('Common - Utils - Data', () => {
     it('should debug log if debug flag is enabled when rejected.', () => {
       const oldArgv = [...process.argv];
       process.argv = ['npm', 'start', '--debug'];
-      axios.get.mockImplementation(getRejectedMock);
+      axios.get.mockImplementationOnce(getRejectedMock);
       jest.resetModules();
       downloadImage = require('../../../src/common/utils/data').downloadImage;
       
-      downloadImage('')
+      return downloadImage('')
         .catch((rejected) => {
           expect(loggerDebugMock.mock.calls.length).toBe(1);
           expect(loggerDebugMock.mock.calls[0][0]).toBe(rejected.response);
 
-          axios.get.mockImplementation(getResolvedMock);
           process.argv = oldArgv;
           jest.resetModules();
           downloadImage = require('../../../src/common/utils/data').downloadImage;
@@ -177,6 +177,16 @@ describe('Common - Utils - Data', () => {
   });
 
   describe('saveImage()', () => {
+    const implementStreamMockWithEvent = (event) => {
+      createWriteStreamMock.mockImplementationOnce((path) => {
+        const stream = new fs.WriteStream(path);
+        setTimeout(() => {
+          stream.emit(event);
+        }, 500);
+        return stream;
+      });
+    };
+
     beforeAll(() => {
       jest.resetModules();
       saveImage = require('../../../src/common/utils/data').saveImage;
@@ -190,29 +200,12 @@ describe('Common - Utils - Data', () => {
       expect(saveImage(guildMock, '')).toBeInstanceOf(Promise);
     });
 
-    it('should resolve an object with data and extension keys.', () => {
-      saveImage(guildMock, '')
-        .then((resolved) => {
-          expect(resolved.data).not.toBeUndefined();
-          expect(resolved.extension).not.toBeUndefined();
-          expect(resolved.data).toBeInstanceOf(Stream);
-          expect(typeof resolved.extension).toBe('string');
-        });
-    });
-
-    it('should should call fs.createWriteStream with the proper arguments when resolved.', () => {
-      saveImage(guildMock, '')
-        .then((resolved) => {
+    it('should call fs.createWriteStream with the proper arguments.', () => {
+      implementStreamMockWithEvent('finish');
+      return saveImage(guildMock, '')
+        .then(() => {
           expect(createWriteStreamMock.mock.calls.length).toBe(1);
-          expect(createWriteStreamMock.mock.calls[0][0]).toBe(path.join(imageFolder, `${guildMock.id}.${resolved.extension}`));
-        });
-    });
-
-    it('should call data.pipe with an instance of fs.WriteStream.', () => {
-      saveImage(guildMock, '')
-        .then((resolved) => {
-          expect(resolved.data.pipe.mock.calls.length).toBe(1);
-          expect(resolved.data.pipe.mock.calls[0][0]).toBeInstanceOf(fs.WriteStream);
+          expect(typeof createWriteStreamMock.mock.calls[0][0]).toBe('string');
         });
     });
   });
@@ -232,16 +225,18 @@ describe('Common - Utils - Data', () => {
     });
 
     it('should call fs.readdir once with the path of the image folder.', () => {
-      getImageFile(guildMock);
-
-      expect(readdirMock.mock.calls.length).toBe(1);
-      expect(readdirMock.mock.calls[0][0]).toBe(imageFolder);
+      readdirMock.mockImplementationOnce((path, cb) => cb(null, [`${guildMock.id}`]));
+      return getImageFile(guildMock)
+        .then(() => {
+          expect(readdirMock.mock.calls.length).toBe(1);
+          expect(readdirMock.mock.calls[0][0]).toBe(imageFolder);
+        });
     });
 
     it('should resolve with a filename if image is found.', () => {
       readdirMock.mockImplementationOnce((path, cb) => cb(null, [`${guildMock.id}`]));
 
-      getImageFile(guildMock)
+      return getImageFile(guildMock)
         .then((resolved) => {
           expect(resolved).toBe(path.resolve(imageFolder, `${guildMock.id}`));
         });
@@ -250,7 +245,7 @@ describe('Common - Utils - Data', () => {
     it('should resolve with null if image is not found.', () => {
       readdirMock.mockImplementationOnce((path, cb) => cb(null, []));
 
-      getImageFile(guildMock)
+      return getImageFile(guildMock)
         .then((resolved) => {
           expect(resolved).toBeNull();
         });
@@ -260,7 +255,7 @@ describe('Common - Utils - Data', () => {
       const error = new Error();
       readdirMock.mockImplementationOnce((path, cb) => cb(error, []));
 
-      getImageFile(guildMock)
+      return getImageFile(guildMock)
         .catch((rejected) => {
           expect(rejected).toBe(error);
         });
@@ -285,16 +280,18 @@ describe('Common - Utils - Data', () => {
     });
 
     it('should call fs.readdir once with the path of the image folder.', () => {
-      removeImage(guildMock);
-
-      expect(readdirMock.mock.calls.length).toBe(1);
-      expect(readdirMock.mock.calls[0][0]).toBe(imageFolder);
+      readdirMock.mockImplementation((path, cb) => cb(null, ['999']));
+      return removeImage(guildMock)
+        .then(() => {
+          expect(readdirMock.mock.calls.length).toBe(1);
+          expect(readdirMock.mock.calls[0][0]).toBe(imageFolder);
+        });
     });
 
     it('should resolve with false if image is not found.', () => {
       readdirMock.mockImplementation((path, cb) => cb(null, ['999'])); // not guildMock.id
 
-      removeImage(guildMock)
+      return removeImage(guildMock)
         .then((resolved) => {
           expect(resolved).toBe(false);
         });
@@ -302,8 +299,9 @@ describe('Common - Utils - Data', () => {
 
     it('should resolve with true if image is found.', () => {
       readdirMock.mockImplementation((path, cb) => cb(null, [`${guildMock.id}`]));
+      unlinkMock.mockImplementation((path, cb) => cb());
 
-      removeImage(guildMock)
+      return removeImage(guildMock)
         .then((resolved) => {
           expect(resolved).toBe(true);
         });
@@ -313,7 +311,7 @@ describe('Common - Utils - Data', () => {
       const error = new Error();
       readdirMock.mockImplementation((path, cb) => cb(error, []));
 
-      removeImage(guildMock)
+      return removeImage(guildMock)
         .catch((rejected) => {
           expect(rejected).toBe(error);
         });
@@ -321,23 +319,29 @@ describe('Common - Utils - Data', () => {
 
     it('should call fs.unlink with the image path as first argument if image was found.', () => {
       readdirMock.mockImplementation((path, cb) => cb(null, [`${guildMock.id}`]));
+      unlinkMock.mockImplementation((path, cb) => cb());
 
-      removeImage(guildMock);
-      expect(unlinkMock.mock.calls.length).toBe(1);
+      return removeImage(guildMock)
+        .then(() => {
+          expect(unlinkMock.mock.calls.length).toBe(1);
+          expect(unlinkMock.mock.calls[0][0]).toBe(path.join(imageFolder, `${guildMock.id}`));
+        });
     });
 
     it('should not call fs.unlink if image was not found.', () => {
       readdirMock.mockImplementation((path, cb) => cb(null, ['999'])); // not guildMock.id
 
-      removeImage(guildMock);
-      expect(unlinkMock.mock.calls.length).toBe(0);
+      return removeImage(guildMock)
+        .then(() => {
+          expect(unlinkMock.mock.calls.length).toBe(0);
+        });
     });
 
     it('should reject if error was found in fs.readdir.', () => {
       const error = new Error();
       unlinkMock.mockImplementation((path, cb) => cb(error));
 
-      removeImage(guildMock)
+      return removeImage(guildMock)
         .catch((rejected) => {
           expect(rejected).toBe(error);
         });
