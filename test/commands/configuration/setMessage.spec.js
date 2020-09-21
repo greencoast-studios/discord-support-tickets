@@ -6,12 +6,12 @@ import { discordErrors, guildSettingKeys } from '../../../src/common/constants';
 
 let command;
 
-const loggerInfoMock = jest.spyOn(logger, 'info');
-const loggerErrorMock = jest.spyOn(logger, 'error');
+jest.mock('@greencoast/logger');
 
 describe('Commands - SetMessage', () => {
   beforeEach(() => {
     messageMock.reply.mockClear();
+    logger.info.mockClear();
   });
 
   it('should be instance of CustomCommand.', () => {
@@ -21,8 +21,8 @@ describe('Commands - SetMessage', () => {
 
   it('should call logger.info with the proper message.', () => {
     command.run(messageMock, []);
-    expect(loggerInfoMock.mock.calls.length).toBe(1);
-    expect(loggerInfoMock.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
+    expect(logger.info.mock.calls.length).toBe(1);
+    expect(logger.info.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
   });
 
   describe('Arg: No args', () => {
@@ -87,7 +87,7 @@ describe('Commands - SetMessage', () => {
         error.message = discordErrors.unknownMessage.message;
 
         messageMock.channel.messages.fetch.mockClear();
-        loggerErrorMock.mockClear();
+        logger.error.mockClear();
         messageMock.channel.messages.fetch.mockRejectedValue(error);
         command = new SetMessageCommand(clientMock);
       });
@@ -106,8 +106,8 @@ describe('Commands - SetMessage', () => {
         expect.assertions(2);
         return command.run(messageMock, [messageMock.id])
           .then(() => {
-            expect(loggerErrorMock.mock.calls.length).toBe(1);
-            expect(loggerErrorMock.mock.calls[0][0]).toBe(error);
+            expect(logger.error.mock.calls.length).toBe(1);
+            expect(logger.error.mock.calls[0][0]).toBe(error);
           });
       });
     });

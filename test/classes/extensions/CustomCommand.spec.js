@@ -4,14 +4,13 @@ import { clientMock, messageMock } from '../../../__mocks__/discordMocks';
 
 let command;
 
-const loggerInfoMock = jest.spyOn(logger, 'info');
-const loggerErrorMock = jest.spyOn(logger, 'error');
+jest.mock('@greencoast/logger');
 
 describe('Classes - Extensions - CustomCommand', () => {
   beforeEach(() => {
     messageMock.reply.mockClear();
-    loggerInfoMock.mockClear();
-    loggerErrorMock.mockClear();
+    logger.info.mockClear();
+    logger.error.mockClear();
     clientMock.provider.get.mockClear();
     clientMock.owners.forEach((owner) => {
       owner.send.mockClear();
@@ -35,8 +34,8 @@ describe('Classes - Extensions - CustomCommand', () => {
     it('should log the error with error level logger.', () => {
       const error = new Error();
       command.onError(error, messageMock);
-      expect(loggerErrorMock.mock.calls.length).toBe(1);
-      expect(loggerErrorMock.mock.calls[0][0]).toBe(error);
+      expect(logger.error.mock.calls.length).toBe(1);
+      expect(logger.error.mock.calls[0][0]).toBe(error);
     });
 
     it('should send a message to the owner if enabled.', () => {
@@ -62,8 +61,8 @@ describe('Classes - Extensions - CustomCommand', () => {
   describe('run()', () => {
     it('should call logger.info with the proper message.', () => {
       command.run(messageMock);
-      expect(loggerInfoMock.mock.calls.length).toBe(1);
-      expect(loggerInfoMock.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
+      expect(logger.info.mock.calls.length).toBe(1);
+      expect(logger.info.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
     });
   });
 });

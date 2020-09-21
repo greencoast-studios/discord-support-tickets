@@ -3,24 +3,23 @@ import { MessageAttachment } from 'discord.js';
 import ImageCommand from '../../../src/commands/configuration/image';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock } from '../../../__mocks__/discordMocks';
-import * as data from '../../../src/common/utils/data';
+import { getImageFile, saveImage, removeImage } from '../../../src/common/utils/data';
 
 let command, runPromise;
 
-const loggerInfoMock = jest.spyOn(logger, 'info');
-const getImageMock = jest.spyOn(data, 'getImageFile');
-const saveImageMock = jest.spyOn(data, 'saveImage');
-const removeImageMock = jest.spyOn(data, 'removeImage');
+jest.mock('@greencoast/logger');
+jest.mock('../../../src/common/utils/data');
 
 describe('Commands - Image', () => {
   beforeEach(() => {
-    getImageMock.mockResolvedValue(null);
+    getImageFile.mockResolvedValue(null);
     messageMock.reply.mockClear();
     messageMock.say.mockClear();
+    logger.info.mockClear();
   });
 
   afterEach(() => {
-    getImageMock.mockClear();
+    getImageFile.mockClear();
   });
 
   it('should be instance of CustomCommand.', () => {
@@ -30,17 +29,17 @@ describe('Commands - Image', () => {
 
   it('should call logger.info with the proper message.', () => {
     runPromise = command.run(messageMock, []);
-    expect(loggerInfoMock.mock.calls.length).toBe(1);
-    expect(loggerInfoMock.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
+    expect(logger.info.mock.calls.length).toBe(1);
+    expect(logger.info.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
   });
 
   describe('Arg: No args', () => {
     afterEach(() => {
-      getImageMock.mockClear();
+      getImageFile.mockClear();
     });
 
     it('should call message.reply when the image was not found with the proper message.', () => {
-      getImageMock.mockResolvedValue(null);
+      getImageFile.mockResolvedValue(null);
       command = new ImageCommand(clientMock);
       runPromise = command.run(messageMock, []);
 
@@ -52,7 +51,7 @@ describe('Commands - Image', () => {
     });
 
     it('should call message.say when the image was found with the proper message.', () => {
-      getImageMock.mockResolvedValue('file');
+      getImageFile.mockResolvedValue('file');
       command = new ImageCommand(clientMock);
       runPromise = command.run(messageMock, []);
 
@@ -76,12 +75,12 @@ describe('Commands - Image', () => {
     });
 
     beforeEach(() => {
-      saveImageMock.mockResolvedValue(null);
+      saveImage.mockResolvedValue(null);
       command = new ImageCommand(clientMock);
     });
     
     afterEach(() => {
-      saveImageMock.mockClear();
+      saveImage.mockClear();
     });
 
     it('should reply with the attachment required message if no attachment is sent.', () => {
@@ -108,11 +107,11 @@ describe('Commands - Image', () => {
     });
     
     afterEach(() => {
-      removeImageMock.mockClear();
+      removeImage.mockClear();
     });
 
     it('should reply with non existing image message if image did not exist.', () => {
-      removeImageMock.mockResolvedValue(false);
+      removeImage.mockResolvedValue(false);
       runPromise = command.run(messageMock, ['remove']);
 
       return runPromise
@@ -123,7 +122,7 @@ describe('Commands - Image', () => {
     });
 
     it('should reply with the image removed if image existed.', () => {
-      removeImageMock.mockResolvedValue(true);
+      removeImage.mockResolvedValue(true);
       runPromise = command.run(messageMock, ['remove']);
 
       return runPromise

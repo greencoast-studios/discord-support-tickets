@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import fs from 'fs';
-let settings;
+let settings; // since I'm testing variables, I have to reset the modules so that they're recomputed.
 
 const existsSyncMock = jest.spyOn(fs, 'existsSync');
 const readFileSyncMock = jest.spyOn(fs, 'readFileSync');

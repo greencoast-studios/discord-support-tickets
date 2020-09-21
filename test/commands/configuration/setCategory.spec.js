@@ -6,11 +6,12 @@ import { guildSettingKeys } from '../../../src/common/constants';
 
 let command;
 
-const loggerInfoMock = jest.spyOn(logger, 'info');
+jest.mock('@greencoast/logger');
 
 describe('Commands - SetCategory', () => {
   beforeEach(() => {
     messageMock.reply.mockClear();
+    logger.info.mockClear();
   });
 
   it('should be instance of CustomCommand.', () => {
@@ -20,8 +21,8 @@ describe('Commands - SetCategory', () => {
 
   it('should call logger.info with the proper message.', () => {
     command.run(messageMock, []);
-    expect(loggerInfoMock.mock.calls.length).toBe(1);
-    expect(loggerInfoMock.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
+    expect(logger.info.mock.calls.length).toBe(1);
+    expect(logger.info.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
   });
 
   describe('Arg: No args', () => {
