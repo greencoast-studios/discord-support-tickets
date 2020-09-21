@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Stream from 'stream';
+import { PassThrough } from 'stream';
 
 export const successfulResponseMock = {
   config: {
@@ -16,7 +16,7 @@ export const failedResponseMock = {
 export const getResolvedMock = (url, options) => Promise.resolve(
   {
     ...successfulResponseMock,
-    data: options.responseType === 'stream' ? new Stream() : {}
+    data: options.responseType === 'stream' ? new PassThrough() : {}
   }
 );
 
