@@ -75,14 +75,22 @@ describe('Common - Utils - Data', () => {
 
   describe('createDatabaseFile()', () => {
     beforeEach(() => {
+      fs.existsSync.mockClear();
       fs.mkdirSync.mockClear();
       fs.writeFileSync.mockClear();
     });
 
-    it('should call fs.mkdirSync with dataFolder.', () => {
+    it('should call fs.mkdirSync with dataFolder if does not exist.', () => {
+      fs.existsSync.mockReturnValueOnce(false);
       createDatabaseFile();
       expect(fs.mkdirSync.mock.calls.length).toBe(1);
       expect(fs.mkdirSync.mock.calls[0][0]).toBe(dataFolder);
+    });
+
+    it('should call not fs.mkdirSync if folder exists.', () => {
+      fs.existsSync.mockReturnValueOnce(true);
+      createDatabaseFile();
+      expect(fs.mkdirSync.mock.calls.length).toBe(0);
     });
 
     it('should call fs.writeFileSync with dbFilePath and empty string.', () => {

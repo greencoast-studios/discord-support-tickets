@@ -16,7 +16,10 @@ export const imageDirectoryExists = () => {
 };
 
 export const createDatabaseFile = () => {
-  fs.mkdirSync(dataFolder);
+  if (!fs.existsSync(dataFolder)) {
+    fs.mkdirSync(dataFolder);
+  }
+  
   fs.writeFileSync(dbFilePath, '');
 };
 
