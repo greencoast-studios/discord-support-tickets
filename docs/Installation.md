@@ -46,11 +46,11 @@ Your file should have the following shape:
 To install the dependencies you may use the following command:
 
 ``` text
-npm ci --only=prod
+npm ci
 ```
 
 > `npm ci` is used instead of `npm install` to make sure that the installed dependencies are the same version as specified in the `package-lock.json` file.
-> The `--only=prod` flag will download only the required dependencies to run the bot.
+> This will still install development dependencies which are necessary to build.
 
 Next, you will need to build the bot:
 
@@ -76,8 +76,6 @@ To run the Docker image you will need the following:
 
 * [Docker](https://www.docker.com/)
 
-You will also need to be logged in to the GitHub Package Registry, to do that you may follow [this guide](https://docs.github.com/en/packages/using-github-packages-with-your-projects-ecosystem/configuring-docker-for-use-with-github-packages#authenticating-to-github-packages).
-
 ### :framed_picture: Running the Image
 
 You can run the image with the following command:
@@ -96,5 +94,5 @@ You may use the following environment variables:
 |----------------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------|
 | `DISCORD_TOKEN`                  | Yes           | The bot's Discord Token. You can acquire one [here](https://discord.com/developers/applications).                           |
 | `PREFIX`                         | No            | The bot's prefix. You can still use the bot by mentioning it. If this is not set, the bot will use the default prefix: `$`. |
-| `OWNER_ID`                       | No            | The bot's owner's ID. If specified, the bot will send error stacks to the owner through DM.                                 |
+| `OWNER_ID`                       | No            | The bot's owner's ID. If specified and logging is enabled, the bot will send error stacks to the owner through DM.          |
 | `INVITE_URL`                     | No            | The bot's invite URL.                                                                                                       |
