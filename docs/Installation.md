@@ -83,8 +83,10 @@ You will also need to be logged in to the GitHub Package Registry, to do that yo
 You can run the image with the following command:
 
 ``` text
-docker run -it -e DISCORD_TOKEN="YOUR_DISCORD_TOKEN_HERE" docker.pkg.github.com/greencoast-studios/discord_support_tickets/bot
+docker run -it -e DISCORD_TOKEN="YOUR_DISCORD_TOKEN_HERE" -v "local/folder/for/data":"/opt/app/data" greencoast/discord-support-tickets
 ```
+
+> Use the `/opt/app/data` volume to save persistent data like guild information database and images.
 
 #### :floppy_disk: Environment Variables
 

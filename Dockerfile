@@ -16,4 +16,6 @@ ENV INVITE_URL ""
 
 COPY . .
 
+VOLUME /opt/app/data
+
 CMD ["npm", "start"]
