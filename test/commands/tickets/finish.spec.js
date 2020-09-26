@@ -1,5 +1,4 @@
 import logger from '@greencoast/logger';
-import { DiscordAPIError } from 'discord.js';
 import FinishCommand from '../../../src/commands/tickets/finish';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock, channelMock } from '../../../__mocks__/discordMocks';
@@ -60,7 +59,7 @@ describe('Commands - Finish', () => {
       return command.run(messageMock)
         .then(() => {
           expect(logger.info.mock.calls.length).toBe(2);
-          expect(logger.info.mock.calls[1][0]).toBe(`Ticket ${channelMock.name} has been finished. Channel removed in ${messageMock.guild.name}.`)
+          expect(logger.info.mock.calls[1][0]).toBe(`Ticket ${channelMock.name} has been finished. Channel removed in ${messageMock.guild.name}.`);
         });
     });
 
