@@ -124,8 +124,9 @@ describe('Classes - Extensions - ExtendedClient', () => {
       guildMock.channels.create.mockResolvedValueOnce(channelMock);
 
       return client.createSupportChannel(guildMock, userMock)
-        .then((channel) => {
+        .then(({ channel, staffRoleID }) => {
           expect(channel).toBe(channelMock);
+          expect(staffRoleID).toBe(staffID);
         });
     });
 
@@ -139,7 +140,7 @@ describe('Classes - Extensions - ExtendedClient', () => {
       });
 
       return client.createSupportChannel(guildMock, userMock)
-        .then((channel) => {
+        .then(({ channel }) => {
           expect(channel.name).toBe(`ticket-${userMock.username}`);
           expect(channel.parent).toBe(staffID);
         });

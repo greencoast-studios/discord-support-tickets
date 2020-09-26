@@ -74,7 +74,7 @@ class ExtendedClient extends CommandoClient {
         reason: `Support channel for **${user.username}**`
       })
         .then((channel) => {
-          resolve(channel);
+          resolve({ channel, staffRoleID });
         })
         .catch((error) => {
           reject(error);
