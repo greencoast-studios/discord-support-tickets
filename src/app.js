@@ -1,12 +1,13 @@
-import { CommandoClient, SQLiteProvider } from 'discord.js-commando';
+import { SQLiteProvider } from 'discord.js-commando';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
 import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory } from './common/utils/data';
+import ExtendedClient from './classes/extensions/ExtendedClient';
 
-const client = new CommandoClient({
+const client = new ExtendedClient({
   commandPrefix: prefix,
   owner: ownerID,
   invite: inviteURL
@@ -33,10 +34,12 @@ client.on('error', (error) => {
 
 client.on('guildCreate', (guild) => {
   logger.info(`Joined ${guild.name} guild!`);
+  client.updatePresence();
 });
 
 client.on('guildDelete', (guild) => {
   logger.info(`Left ${guild.name} guild!`);
+  client.updatePresence();
 });
 
 client.on('guildUnavailable', (guild) => {
@@ -70,10 +73,20 @@ client.on('ready', () => {
   open({
     filename: dbFilePath,
     driver: sqlite3.Database
-  }).then((db) => {
-    client.setProvider(new SQLiteProvider(db));
-    logger.info('Database loaded.');
-  });
+  })
+    .then((db) => {
+      client.setProvider(new SQLiteProvider(db))
+        .then(() => {
+          logger.info('Database loaded.');
+          client.updatePresence();
+        })
+        .catch((error) => {
+          logger.error(error);
+        });
+    })
+    .catch((error) => {
+      logger.error(error);
+    });
 });
 
 client.on('warn', (info) => {
