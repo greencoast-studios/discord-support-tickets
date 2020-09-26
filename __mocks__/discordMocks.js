@@ -38,10 +38,12 @@ export const messageMock = {
   guild: guildMock,
   say: jest.fn(),
   channel: {
+    id: '345',
     messages: {
       fetch: jest.fn()
     }
-  }
+  },
+  react: jest.fn(() => Promise.resolve())
 };
 
 export const channelMock = {

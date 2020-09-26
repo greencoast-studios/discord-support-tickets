@@ -49,7 +49,7 @@ describe('Commands - SetMessage', () => {
       });
 
       it('should reply with message already set if value was already saved.', () => {
-        clientMock.provider.get.mockImplementation(() => messageMock.id);
+        clientMock.provider.get.mockImplementation(() => ({ message: messageMock.id }));
         return command.run(messageMock, [messageMock.id])
           .then(() => {
             expect(messageMock.reply.mock.calls.length).toBe(1);
@@ -64,12 +64,14 @@ describe('Commands - SetMessage', () => {
             expect(clientMock.provider.set.mock.calls.length).toBe(1);
             expect(clientMock.provider.set.mock.calls[0][0]).toBe(messageMock.guild);
             expect(clientMock.provider.set.mock.calls[0][1]).toBe(guildSettingKeys.ticketMessage);
-            expect(clientMock.provider.set.mock.calls[0][2]).toBe(messageMock.id);
+            expect(clientMock.provider.set.mock.calls[0][2]).toStrictEqual({
+              channel: messageMock.channel.id, message: messageMock.id
+            });
           });
       });
 
       it('should reply with the message changed message if a new value was provided.', () => {
-        clientMock.provider.get.mockImplementation(() => 'old id');
+        clientMock.provider.get.mockImplementation(() => ({ channel: 'old id', message: 'old id' }));
         return command.run(messageMock, [messageMock.id])
           .then(() => {
             expect(messageMock.reply.mock.calls.length).toBe(1);
