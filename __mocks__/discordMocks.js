@@ -15,11 +15,13 @@ export const guildMock = {
   channels: {
     cache: {
       find: jest.fn()
-    }
+    },
+    create: jest.fn(() => Promise.resolve)
   },
   roles: {
     cache: {
-      find: jest.fn()
+      find: jest.fn(),
+      map: jest.fn()
     }
   },
   id: '123',
@@ -53,4 +55,9 @@ export const roleMock = {
   name: 'name',
   id: '123',
   mentionable: true
+};
+
+export const userMock = {
+  id: '123',
+  username: 'user'
 };

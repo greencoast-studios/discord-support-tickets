@@ -1,6 +1,7 @@
 import { CommandoClient } from 'discord.js-commando';
+import { Permissions } from 'discord.js';
 import logger from '@greencoast/logger';
-import { presenceStatus, activityType, guildSettingKeys } from '../../common/constants';
+import { presenceStatus, activityType, guildSettingKeys, SUPPORT_CHANNEL_PERMISSIONS } from '../../common/constants';
 
 class ExtendedClient extends CommandoClient {
   updatePresence() {
@@ -24,6 +25,60 @@ class ExtendedClient extends CommandoClient {
       logger.info(`Presence updated to: ${presenceMessage}`);
     }).catch((error) => {
       logger.error(error);
+    });
+  }
+
+  createSupportChannel(guild, user) {
+    return new Promise((resolve, reject) => {
+      const staffRoleID = this.provider.get(guild, guildSettingKeys.staffRole, null);
+      if (!staffRoleID) {
+        reject(new Error('Role does not exist in database.'));
+        return;
+      }
+
+      const channelCategoryID = this.provider.get(guild, guildSettingKeys.channelCategory, null);
+      if (!channelCategoryID) {
+        reject(new Error('Channel category does not exist in database.'));
+        return;
+      }
+
+      const permissions = guild.roles.cache.map((role) => {
+        const overwrite = {
+          id: role.id,
+          type: 'role'
+        };
+
+        if (role.id === staffRoleID) {
+          overwrite.allow = new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS);
+        } else {
+          overwrite.deny = Permissions.ALL;
+        }
+
+        return overwrite;
+      });
+      permissions.push({
+        id: user.id,
+        type: 'member',
+        allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS)
+      }, {
+        id: this.user.id,
+        type: 'member',
+        allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS)
+      });
+
+      guild.channels.create(`ticket-${user.username}`, {
+        type: 'text',
+        topic: `Support channel for **${user.username}**`,
+        parent: channelCategoryID,
+        permissionOverwrites: permissions,
+        reason: `Support channel for **${user.username}**`
+      })
+        .then((channel) => {
+          resolve(channel);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 }

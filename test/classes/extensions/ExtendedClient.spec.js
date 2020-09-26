@@ -1,7 +1,9 @@
 import { CommandoClient } from 'discord.js-commando';
+import { Permissions } from 'discord.js';
 import logger from '@greencoast/logger';
 import ExtendedClient from '../../../src/classes/extensions/ExtendedClient';
-import { guildMock } from '../../../__mocks__/discordMocks';
+import { guildMock, userMock, channelMock } from '../../../__mocks__/discordMocks';
+import { guildSettingKeys, SUPPORT_CHANNEL_PERMISSIONS } from '../../../src/common/constants';
 
 jest.mock('@greencoast/logger');
 jest.mock('discord.js-commando', () => ({
@@ -11,7 +13,8 @@ jest.mock('discord.js-commando', () => ({
 // Have to mock the client here for the time being. Implementing a manual mock in __mocks__ may be a better idea.
 const client = new ExtendedClient();
 client.user = {
-  setPresence: jest.fn(() => Promise.resolve())
+  setPresence: jest.fn(() => Promise.resolve()),
+  id: '472'
 };
 client.guilds = {
   cache: {
@@ -20,7 +23,7 @@ client.guilds = {
   }
 };
 client.provider = {
-  get: jest.fn(() => ['one item'])
+  get: jest.fn()
 };
 
 describe('Classes - Extensions - ExtendedClient', () => {
@@ -34,6 +37,10 @@ describe('Classes - Extensions - ExtendedClient', () => {
   });
 
   describe('updatePresence()', () => {
+    beforeAll(() => {
+      client.provider.get.mockReturnValue(['one item']);
+    });
+
     it('should return a Promise.', () => {
       expect(client.updatePresence()).toBeInstanceOf(Promise);
     });
@@ -69,6 +76,114 @@ describe('Classes - Extensions - ExtendedClient', () => {
         .then(() => {
           expect(logger.error.mock.calls.length).toBe(1);
           expect(logger.error.mock.calls[0][0]).toBe(errorToReject);
+        });
+    });
+  });
+
+  describe('createSupportChannel()', () => {
+    const staffID = '132456789';
+    beforeAll(() => {
+      client.provider.get.mockReturnValue(staffID);
+      guildMock.channels.create.mockResolvedValue();
+      guildMock.roles.cache.map.mockReturnValue([]);
+    });
+
+    beforeEach(() => {
+      guildMock.channels.create.mockClear();
+      guildMock.roles.cache.map.mockClear();
+    });
+
+    it('should return a Promise.', () => {
+      expect(client.createSupportChannel(guildMock, userMock)).toBeInstanceOf(Promise);
+    });
+
+    it('should reject if no staff role is saved in database.', () => {
+      client.provider.get.mockImplementationOnce(() => null);
+      expect.assertions(1);
+
+      return client.createSupportChannel(guildMock, userMock)
+        .catch((error) => {
+          expect(error.message).toBe('Role does not exist in database.');
+        });
+    });
+
+    it('should reject if no channel category is saved in database.', () => {
+      client.provider.get.mockImplementation((_, key) => {
+        return key === guildSettingKeys.channelCategory ? null : true;
+      });
+      expect.assertions(1);
+
+      return client.createSupportChannel(guildMock, userMock)
+        .catch((error) => {
+          expect(error.message).toBe('Channel category does not exist in database.');
+        });
+    });
+
+    it('should resolve the newly created channel.', () => {
+      client.provider.get.mockReturnValue(staffID);
+      guildMock.channels.create.mockResolvedValueOnce(channelMock);
+
+      return client.createSupportChannel(guildMock, userMock)
+        .then((channel) => {
+          expect(channel).toBe(channelMock);
+        });
+    });
+
+    it('should resolve the channel with the correct name and parent.', () => {
+      client.provider.get.mockReturnValue(staffID);
+      guildMock.channels.create.mockImplementationOnce((name, options) => {
+        return Promise.resolve({
+          name,
+          parent: options.parent
+        });
+      });
+
+      return client.createSupportChannel(guildMock, userMock)
+        .then((channel) => {
+          expect(channel.name).toBe(`ticket-${userMock.username}`);
+          expect(channel.parent).toBe(staffID);
+        });
+    });
+
+    it('should call guild.channels.create with the proper permissions.', () => {
+      client.provider.get.mockReturnValue(staffID);
+      guildMock.channels.create.mockResolvedValueOnce();
+      guildMock.roles.cache.map.mockImplementation((cb) => {
+        return [{ id: '666' }, { id: staffID }].map(cb);
+      });
+
+      return client.createSupportChannel(guildMock, userMock)
+        .then(() => {
+          const expectedPermissions = [{
+            deny: Permissions.ALL,
+            id: '666',
+            type: 'role'
+          }, {
+            allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS),
+            id: staffID,
+            type: 'role'
+          }, {
+            type: 'member',
+            id: userMock.id,
+            allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS)
+          }, {
+            type: 'member',
+            id: client.user.id,
+            allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS)
+          }];
+          expect(guildMock.channels.create.mock.calls[0][1].permissionOverwrites).toStrictEqual(expectedPermissions);
+        });
+    });
+
+    it('should reject if the channel creation rejected.', () => {
+      const rejectedError = new Error();
+      client.provider.get.mockReturnValue(staffID);
+      guildMock.channels.create.mockRejectedValueOnce(rejectedError);
+      expect.assertions(1);
+
+      return client.createSupportChannel(guildMock, userMock)
+        .catch((error) => {
+          expect(error).toBe(rejectedError);
         });
     });
   });

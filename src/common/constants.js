@@ -11,6 +11,10 @@ export const discordErrors = {
   unknownMessage: {
     name: 'DiscordAPIError',
     message: 'Unknown Message'
+  },
+  unknownChannelCategory: {
+    name: 'DiscordAPIError',
+    message: 'Invalid Form Body\nparent_id: Category does not exist'
   }
 };
 
@@ -27,3 +31,5 @@ export const activityType = {
   listening: 'LISTENING',
   watching: 'WATCHING'
 };
+
+export const SUPPORT_CHANNEL_PERMISSIONS = ['VIEW_CHANNEL', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_EXTERNAL_EMOJIS'];
