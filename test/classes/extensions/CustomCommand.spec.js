@@ -40,7 +40,6 @@ describe('Classes - Extensions - CustomCommand', () => {
       expect(clientMock.handleError.mock.calls[0][0]).toBe(error);
       expect(clientMock.handleError.mock.calls[0][1]).toBe(messageMock.guild);
       expect(clientMock.handleError.mock.calls[0][2]).toBe(`An error occurred when running the command **${command.name}** in **${messageMock.guild.name}**. Triggering message: **${messageMock.content}**`);
-
     });
   });
 
