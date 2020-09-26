@@ -4,8 +4,7 @@ import sqlite3 from 'sqlite3';
 import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
-import { dbFilePath, dbFileExists, createDatabaseFile } from './common/utils/data';
-import { guildSettingKeys } from './common/constants';
+import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory } from './common/utils/data';
 
 const client = new CommandoClient({
   commandPrefix: prefix,
@@ -17,7 +16,8 @@ client.registry
   .registerDefaultTypes()
   .registerGroups([
     ['misc', 'Miscellaneous Commands'],
-    ['owner-only', 'Owner-only Commands']
+    ['owner-only', 'Owner-only Commands'],
+    ['configuration', 'Configuration Commands']
   ])
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
@@ -61,6 +61,12 @@ client.on('ready', () => {
     logger.info('Database file created!');
   }
 
+  if (!imageDirectoryExists()) {
+    logger.warn('Image directory not found, creating...');
+    createImageDirectory();
+    logger.info('Image directory created!');
+  }
+
   open({
     filename: dbFilePath,
     driver: sqlite3.Database
@@ -72,16 +78,6 @@ client.on('ready', () => {
 
 client.on('warn', (info) => {
   logger.warn(info);
-});
-
-client.on('commandError', (command, error, message) => {
-  logger.error(error);
-
-  if (client.provider.get(message.guild, guildSettingKeys.report, false)) {
-    client.owners.forEach((owner) => {
-      owner.send(`An error occurred when running the command **${command.name}** in **${message.guild.name}**. Triggering message: **${message.content}** \`\`\`${error.stack}\`\`\``);
-    });
-  }
 });
 
 client.login(discordToken);

@@ -20,7 +20,5 @@ $log <toggle>
 
 ## :information_source: Other Information
 
-> Fill the following checklist.
-
 * [ ] The command will work only on guilds.
 * [ ] The command is NSFW.

@@ -1,25 +1,29 @@
+import logger from '@greencoast/logger';
 import LogCommand from '../../../src/commands/owner-only/log';
+import CustomCommand from '../../../src/classes/extensions/CustomCommand';
+import { clientMock, messageMock } from '../../../__mocks__/discordMocks';
 
 let command;
 
-const clientMock = {
-  commandPrefix: '$',
-  provider: {
-    set: jest.fn(),
-    get: jest.fn()
-  }
-};
-
-const messageMock = {
-  reply: jest.fn(),
-  guild: 'guild'
-};
+jest.mock('@greencoast/logger');
 
 describe('Commands - Log', () => {
-  afterEach(() => {
+  beforeEach(() => {
     messageMock.reply.mockClear();
     clientMock.provider.get.mockClear();
     clientMock.provider.set.mockClear();
+    logger.info.mockClear();
+  });
+
+  it('should be instance of CustomCommand.', () => {
+    command = new LogCommand(clientMock);
+    expect(command).toBeInstanceOf(CustomCommand);
+  });
+
+  it('should call logger.info with the proper message.', () => {
+    command.run(messageMock, []);
+    expect(logger.info.mock.calls.length).toBe(1);
+    expect(logger.info.mock.calls[0][0]).toBe(`User ${messageMock.member.displayName} executed ${command.name} from ${messageMock.guild.name}.`);
   });
 
   describe('Arg: No args', () => {

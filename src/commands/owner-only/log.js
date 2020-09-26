@@ -1,3 +1,4 @@
+import logger from '@greencoast/logger';
 import CustomCommand from '../../classes/extensions/CustomCommand';
 import { guildSettingKeys } from '../../common/constants';
 
@@ -25,6 +26,7 @@ class LogCommand extends CustomCommand {
 
     this.client.provider.set(message.guild, guildSettingKeys.log, true);
     message.reply("Logging is now enabled. Chat log files will be saved in the bot's data folder.");
+    logger.info(`Logging has been enabled for ${message.guild.name}.`);
   }
 
   handleDisable(message) {
@@ -37,9 +39,12 @@ class LogCommand extends CustomCommand {
 
     this.client.provider.set(message.guild, guildSettingKeys.log, false);
     message.reply('Logging is now disabled. Chat logs will not be saved.');
+    logger.info(`Logging has been disabled for ${message.guild.name}.`);
   }
 
   run(message, [option]) {
+    super.run(message);
+    
     if (option === 'enable') {
       return this.handleEnable(message);
     }
