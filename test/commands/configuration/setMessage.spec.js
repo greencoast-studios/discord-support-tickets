@@ -57,7 +57,7 @@ describe('Commands - SetMessage', () => {
           });
       });
 
-      it('should save the message id to the db if a new value was provided.', () => {
+      it('should save the channel and message id to the db if a new value was provided.', () => {
         clientMock.provider.get.mockImplementation(() => 'old id');
         return command.run(messageMock, [messageMock.id])
           .then(() => {
