@@ -5,7 +5,7 @@ import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
 import { SUPPORT_EMOJI, guildSettingKeys, discordErrors } from './common/constants';
-import { isThisTheDiscordError} from './common/utils/helpers';
+import { isThisTheDiscordError } from './common/utils/helpers';
 import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory } from './common/utils/data';
 import ExtendedClient from './classes/extensions/ExtendedClient';
 
@@ -93,7 +93,7 @@ client.on('messageReactionAdd', async(reaction, user) => {
 
       channel.send(`Please hang tight ${user.username}, <@&${staffRoleID}> will get to you shortly.`);
       logger.info(`Support channel ${channel.name} has been created in ${guild.name}.`);
-      
+
       client.updatePresence();
     })
     .catch((error) => {
