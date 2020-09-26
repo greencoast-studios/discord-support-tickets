@@ -25,6 +25,14 @@ client.guilds = {
 client.provider = {
   get: jest.fn()
 };
+client.owners = [
+  {
+    send: jest.fn()
+  },
+  {
+    send: jest.fn()
+  }
+];
 
 describe('Classes - Extensions - ExtendedClient', () => {
   beforeEach(() => {
@@ -186,6 +194,60 @@ describe('Classes - Extensions - ExtendedClient', () => {
         .catch((error) => {
           expect(error).toBe(rejectedError);
         });
+    });
+  });
+
+  describe('handleError()', () => {
+    beforeEach(() => {
+      client.provider.get.mockClear();
+      client.owners.forEach((owner) => {
+        owner.send.mockClear();
+      });
+    });
+
+    it('should log the error.', () => {
+      const expectedError = new Error();
+      client.handleError(expectedError);
+      expect(logger.error.mock.calls.length).toBe(1);
+      expect(logger.error.mock.calls[0][0]).toBe(expectedError);
+    });
+
+    it('should not call provider.get if no guild was specified.', () => {
+      client.handleError(new Error());
+      expect(client.provider.get.mock.calls.length).toBe(0);
+    });
+
+    it('should not call owners.send if reporting was disabled.', () => {
+      client.provider.get.mockReturnValueOnce(false);
+      client.handleError(new Error(), guildMock);
+      client.owners.forEach((owner) => {
+        expect(owner.send.mock.calls.length).toBe(0);
+      });
+    });
+
+    it('should call owners.send once per owner if reporting was enabled.', () => {
+      client.provider.get.mockReturnValueOnce(true);
+      client.handleError(new Error(), guildMock);
+      client.owners.forEach((owner) => {
+        expect(owner.send.mock.calls.length).toBe(1);
+      });
+    });
+
+    it('should send the message with info prepended if provided.', () => {
+      const info = 'This is the information of the error';
+      client.provider.get.mockReturnValueOnce(true);
+      client.handleError(new Error(), guildMock, info);
+      client.owners.forEach((owner) => {
+        expect(owner.send.mock.calls[0][0].startsWith(info)).toBe(true);
+      });
+    });
+
+    it('should send the generic message if info was not provided.', () => {
+      client.provider.get.mockReturnValueOnce(true);
+      client.handleError(new Error(), guildMock);
+      client.owners.forEach((owner) => {
+        expect(owner.send.mock.calls[0][0].startsWith('An error has ocurred:')).toBe(true);
+      });
     });
   });
 });

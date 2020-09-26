@@ -8,7 +8,8 @@ export const clientMock = {
     {
       send: jest.fn()
     }
-  ]
+  ],
+  handleError: jest.fn()
 };
 
 export const guildMock = {

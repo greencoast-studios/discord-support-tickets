@@ -81,6 +81,21 @@ class ExtendedClient extends CommandoClient {
         });
     });
   }
+
+  handleError(error, guild = null, info = null) {
+    logger.error(error);
+
+    if (!guild) {
+      return;
+    }
+
+    if (this.provider.get(guild, guildSettingKeys.report, false)) {
+      const messageToOwner = info ? `${info} \`\`\`${error.stack}\`\`\`` : `An error has ocurred: \`\`\`${error.stack}\`\`\``;
+      this.owners.forEach((owner) => {
+        owner.send(messageToOwner);
+      });
+    }
+  }
 }
 
 export default ExtendedClient;
