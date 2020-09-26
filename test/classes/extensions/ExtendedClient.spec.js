@@ -178,7 +178,7 @@ describe('Classes - Extensions - ExtendedClient', () => {
           }, {
             type: 'member',
             id: client.user.id,
-            allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS)
+            allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS, 'MANAGE_CHANNELS')
           }];
           expect(guildMock.channels.create.mock.calls[0][1].permissionOverwrites).toStrictEqual(expectedPermissions);
         });
