@@ -24,7 +24,7 @@ class ExtendedClient extends CommandoClient {
     }).then(() => {
       logger.info(`Presence updated to: ${presenceMessage}`);
     }).catch((error) => {
-      logger.error(error);
+      this.handleError(error);
     });
   }
 
