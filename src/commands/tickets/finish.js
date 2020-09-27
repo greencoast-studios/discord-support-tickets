@@ -7,6 +7,7 @@ class FinishCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'finish',
+      emoji: ':tada:',
       memberName: 'finish',
       group: 'tickets',
       description: 'Finish the current ticket',

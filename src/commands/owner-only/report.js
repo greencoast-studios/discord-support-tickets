@@ -6,6 +6,7 @@ class ReportCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'report',
+      emoji: ':bug:',
       memberName: 'report',
       group: 'owner-only',
       description: 'Enable or disable the reporting of errors to the owner.',

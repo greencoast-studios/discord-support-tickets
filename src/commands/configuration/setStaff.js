@@ -7,6 +7,7 @@ class SetStaffCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'setstaff',
+      emoji: ':busts_in_silhouette:',
       memberName: 'setstaff',
       group: 'configuration',
       description: 'Set the staff role that will be pinged when starting a ticket.',

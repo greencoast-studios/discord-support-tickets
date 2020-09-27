@@ -6,6 +6,7 @@ class SetCategoryCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'setcategory',
+      emoji: ':inbox_tray:',
       memberName: 'setcategory',
       group: 'configuration',
       description: 'Set the category under which the channels will be created.',

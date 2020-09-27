@@ -7,6 +7,7 @@ class ImageCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'image',
+      emoji: ':frame_photo:',
       memberName: 'image',
       group: 'configuration',
       description: 'Set the image that will be sent to the newly created channel.',

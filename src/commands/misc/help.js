@@ -6,6 +6,7 @@ class HelpCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'help',
+      emoji: ':question:',
       memberName: 'help',
       group: 'misc',
       description: 'Get a description of all the commands you can use.',
