@@ -20,7 +20,7 @@ class HelpCommand extends CustomCommand {
 
     const sectionedCommandList = this.client.registry.groups.map((group) => {
       const listOfCommands = group.commands.reduce((text, command) => {
-        return `${text} **${command.name}** - ${command.description} \n`;
+        return `${text} ${command.emoji} **${command.name}** - ${command.description} \n`;
       }, '');
       return { title: group.name, text: listOfCommands };
     });
