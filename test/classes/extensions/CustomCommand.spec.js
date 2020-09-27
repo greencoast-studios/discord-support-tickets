@@ -8,6 +8,8 @@ let command;
 jest.mock('@greencoast/logger');
 
 describe('Classes - Extensions - CustomCommand', () => {
+  const emoji = 'command emoji';
+
   beforeEach(() => {
     messageMock.reply.mockClear();
     logger.info.mockClear();
@@ -17,12 +19,17 @@ describe('Classes - Extensions - CustomCommand', () => {
       name: 'command',
       group: 'group',
       memberName: 'group',
-      description: 'desc'
+      description: 'desc',
+      emoji
     });
   });
 
   it('should be instance of Command.', () => {
     expect(command).toBeInstanceOf(Command);
+  });
+
+  it('should have emoji property.', () => {
+    expect(command.emoji).toBe(emoji);
   });
 
   describe('onError()', () => {

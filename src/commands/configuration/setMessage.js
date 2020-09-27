@@ -7,6 +7,7 @@ class SetMessageCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'setmessage',
+      emoji: ':loudspeaker:',
       memberName: 'setmessage',
       group: 'configuration',
       description: 'Set the message that will be used to handle ticket creation.',

@@ -1,3 +1,13 @@
+export const commandMock = {
+  name: 'command',
+  description: 'description'
+};
+
+export const commandGroupMock = {
+  name: 'group name',
+  commands: [commandMock, commandMock]
+};
+
 export const clientMock = {
   commandPrefix: '$',
   provider: {
@@ -10,7 +20,10 @@ export const clientMock = {
     }
   ],
   handleError: jest.fn(),
-  updatePresence: jest.fn()
+  updatePresence: jest.fn(),
+  registry: {
+    groups: [commandGroupMock, commandGroupMock]
+  }
 };
 
 export const guildMock = {
@@ -45,7 +58,8 @@ export const messageMock = {
       fetch: jest.fn()
     }
   },
-  react: jest.fn(() => Promise.resolve())
+  react: jest.fn(() => Promise.resolve()),
+  embed: jest.fn()
 };
 
 export const channelMock = {

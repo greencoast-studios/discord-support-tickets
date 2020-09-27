@@ -6,6 +6,7 @@ class LogCommand extends CustomCommand {
   constructor(client) {
     super(client, {
       name: 'log',
+      emoji: ':pencil:',
       memberName: 'log',
       group: 'owner-only',
       description: 'Enable or disable the logging of support channels.',
