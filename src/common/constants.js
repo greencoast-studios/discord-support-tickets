@@ -43,5 +43,6 @@ export const SUPPORT_EMOJI = '❗';
 export const MESSAGE_EMBED = {
   color: '#43aa8b',
   thumbnail: 'https://i.imgur.com/Tqnk48j.png',
-  issuesURL: 'https://github.com/greencoast-studios/discord-support-tickets/issues'
+  issuesURL: 'https://github.com/greencoast-studios/discord-support-tickets/issues',
+  wikiURL: 'https://github.com/greencoast-studios/discord-support-tickets/wiki'
 };

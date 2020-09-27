@@ -32,6 +32,7 @@ class HelpCommand extends CustomCommand {
     sectionedCommandList.forEach(({ title, text }) => {
       embed.addField(title, text);
     });
+    embed.addField('Need more info?', `You can access the bot's [wiki page](${MESSAGE_EMBED.wikiURL}) for more information on how to use this bot.`);
     embed.addField('Found a bug?', `This bot is far from perfect, so in case you found a bug, please report it [here](${MESSAGE_EMBED.issuesURL}).`);
 
     message.embed(embed);

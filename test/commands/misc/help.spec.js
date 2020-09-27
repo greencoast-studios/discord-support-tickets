@@ -50,17 +50,20 @@ describe('Commands - Help', () => {
     expect(embed.setTitle.mock.calls.length).toBe(1);
     expect(embed.setColor.mock.calls.length).toBe(1);
     expect(embed.setThumbnail.mock.calls.length).toBe(1);
-    expect(embed.addField.mock.calls.length).toBe(clientMock.registry.groups.length + 1);
+    expect(embed.addField.mock.calls.length).toBe(clientMock.registry.groups.length + 2);
 
     expect(embed.setTitle.mock.calls[0][0]).toBe('Support Tickets Help Message');
     expect(embed.setColor.mock.calls[0][0]).toBe(MESSAGE_EMBED.color);
     expect(embed.setThumbnail.mock.calls[0][0]).toBe(MESSAGE_EMBED.thumbnail);
 
-    for (let i = 0; i < clientMock.registry.groups.length + 1; i++) {
-      expect(embed.addField.mock.calls[i][1].length).toBeLessThan(2048); // Discord max embed field length.
-    }
-    expect(embed.addField.mock.calls[clientMock.registry.groups.length][0]).toBe('Found a bug?');
-    expect(embed.addField.mock.calls[clientMock.registry.groups.length][1]).toBe(`This bot is far from perfect, so in case you found a bug, please report it [here](${MESSAGE_EMBED.issuesURL}).`);
+    embed.addField.mock.calls.forEach((call) => {
+      expect(call[1].length).toBeLessThan(2048); // Discord max embed field length.
+    });
+
+    expect(embed.addField.mock.calls[clientMock.registry.groups.length][0]).toBe('Need more info?');
+    expect(embed.addField.mock.calls[clientMock.registry.groups.length][1]).toBe(`You can access the bot's [wiki page](${MESSAGE_EMBED.wikiURL}) for more information on how to use this bot.`);
+    expect(embed.addField.mock.calls[clientMock.registry.groups.length + 1][0]).toBe('Found a bug?');
+    expect(embed.addField.mock.calls[clientMock.registry.groups.length + 1][1]).toBe(`This bot is far from perfect, so in case you found a bug, please report it [here](${MESSAGE_EMBED.issuesURL}).`);
   });
 
   it('should send an embed.', () => {
