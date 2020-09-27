@@ -4,6 +4,8 @@ import sqlite3 from 'sqlite3';
 import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
+import { SUPPORT_EMOJI, guildSettingKeys, discordErrors } from './common/constants';
+import { isThisTheDiscordError } from './common/utils/helpers';
 import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory } from './common/utils/data';
 import ExtendedClient from './classes/extensions/ExtendedClient';
 
@@ -51,6 +53,70 @@ client.on('invalidated', () => {
   process.exit(1);
 });
 
+client.on('messageReactionAdd', async(reaction, user) => {
+  const { guild } = reaction.message;
+  const ticket = client.provider.get(guild.id, guildSettingKeys.ticketMessage, null);
+
+  if (user.bot || ticket?.message !== reaction.message.id) {
+    return;
+  }
+
+  if (reaction.partial) {
+    await reaction.fetch();
+  }
+
+  reaction.users.remove(user)
+    .catch((error) => {
+      if (isThisTheDiscordError(error, discordErrors.missingPermissions)) {
+        logger.warn(`I don't have enough permissions in ${guild.name} to remove reactions!`);
+        return;
+      }
+      logger.error(error);
+    });
+
+  if (reaction.emoji.name !== SUPPORT_EMOJI) {
+    return;
+  }
+
+  const currentTickets = client.provider.get(guild.id, guildSettingKeys.currentTickets, []);
+  const userHasTicket = currentTickets.some((ticket) => ticket.user === user.id);
+
+  if (userHasTicket) {
+    user.send('You already have a pending ticket. Please wait for staff to assist you.');
+    return;
+  }
+
+  client.createSupportChannel(guild, user)
+    .then(({ channel, staffRoleID }) => {
+      const newTickets = [...currentTickets, { channel: channel.id, user: user.id }];
+      client.provider.set(guild.id, guildSettingKeys.currentTickets, newTickets);
+
+      channel.send(`Please hang tight ${user.username}, <@&${staffRoleID}> will get to you shortly.`);
+      logger.info(`Support channel ${channel.name} has been created in ${guild.name}.`);
+
+      client.updatePresence();
+    })
+    .catch((error) => {
+      if (error.message === 'Role does not exist in database.') {
+        logger.warn(`Could not create support channel for ${user.username} in ${guild.name}, a staff role has not been assigned yet.`);
+        return;
+      }
+
+      if (error.message === 'Channel category does not exist in database.') {
+        logger.warn(`Could not create support channel for ${user.username} in ${guild.name}, a channel category has not been assigned yet.`);
+        return;
+      }
+
+      if (isThisTheDiscordError(error, discordErrors.missingPermissions)) {
+        logger.warn(`I don't have enough permissions in ${guild.name} to create channels!`);
+        return;
+      }
+
+      logger.error(`There was an error creating the support channel for ${user.username} from ${guild.name}.`);
+      logger.error(error);
+    });
+});
+
 client.on('rateLimit', (info) => {
   logger.warn(info);
 });
@@ -79,6 +145,13 @@ client.on('ready', () => {
         .then(() => {
           logger.info('Database loaded.');
           client.updatePresence();
+
+          client.guilds.cache.each((guild) => {
+            const ticket = client.provider.get(guild.id, guildSettingKeys.ticketMessage, null);
+            if (ticket) {
+              guild.channels.cache.find((channel) => channel.id === ticket.channel).messages.fetch(ticket.message);
+            }
+          });
         })
         .catch((error) => {
           logger.error(error);

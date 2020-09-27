@@ -1,6 +1,6 @@
 import logger from '@greencoast/logger';
 import CustomCommand from '../../classes/extensions/CustomCommand';
-import { guildSettingKeys, discordErrors } from '../../common/constants';
+import { guildSettingKeys, discordErrors, SUPPORT_EMOJI } from '../../common/constants';
 import { isThisTheDiscordError } from '../../common/utils/helpers';
 
 class SetMessageCommand extends CustomCommand {
@@ -20,12 +20,17 @@ class SetMessageCommand extends CustomCommand {
   updateMessage(message, newMessage) {
     const previousValue = this.client.provider.get(message.guild, guildSettingKeys.ticketMessage);
 
-    if (previousValue === newMessage.id) {
+    if (previousValue?.message === newMessage.id) {
       message.reply('This message is already the ticket message.');
       return;
     }
 
-    this.client.provider.set(message.guild, guildSettingKeys.ticketMessage, newMessage.id);
+    const newTicket = { channel: newMessage.channel.id, message: newMessage.id };
+    this.client.provider.set(message.guild, guildSettingKeys.ticketMessage, newTicket);
+    newMessage.react(SUPPORT_EMOJI)
+      .catch((error) => {
+        this.onError(error, message);
+      });
     message.reply('The ticket message has been updated.');
     logger.info(`Changed ticket message for ${message.guild.name}.`);
   }

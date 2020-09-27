@@ -15,6 +15,10 @@ export const discordErrors = {
   unknownChannelCategory: {
     name: 'DiscordAPIError',
     message: 'Invalid Form Body\nparent_id: Category does not exist'
+  },
+  missingPermissions: {
+    name: 'DiscordAPIError',
+    message: 'Missing Permissions'
   }
 };
 
@@ -33,3 +37,5 @@ export const activityType = {
 };
 
 export const SUPPORT_CHANNEL_PERMISSIONS = ['VIEW_CHANNEL', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_EXTERNAL_EMOJIS'];
+
+export const SUPPORT_EMOJI = '❗';
