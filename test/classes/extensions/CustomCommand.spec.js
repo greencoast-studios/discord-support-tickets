@@ -1,3 +1,4 @@
+import { Command } from 'discord.js-commando';
 import logger from '@greencoast/logger';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock } from '../../../__mocks__/discordMocks';
@@ -22,6 +23,10 @@ describe('Classes - Extensions - CustomCommand', () => {
       memberName: 'group',
       description: 'desc'
     });
+  });
+
+  it('should be instance of Command.', () => {
+    expect(command).toBeInstanceOf(Command);
   });
 
   describe('onError()', () => {
