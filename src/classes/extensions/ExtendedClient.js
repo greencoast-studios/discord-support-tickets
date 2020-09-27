@@ -24,7 +24,7 @@ class ExtendedClient extends CommandoClient {
     }).then(() => {
       logger.info(`Presence updated to: ${presenceMessage}`);
     }).catch((error) => {
-      logger.error(error);
+      this.handleError(error);
     });
   }
 
@@ -80,6 +80,21 @@ class ExtendedClient extends CommandoClient {
           reject(error);
         });
     });
+  }
+
+  handleError(error, guild = null, info = null) {
+    logger.error(error);
+
+    if (!guild) {
+      return;
+    }
+
+    if (this.provider.get(guild, guildSettingKeys.report, false)) {
+      const messageToOwner = info ? `${info} \`\`\`${error.stack}\`\`\`` : `An error has ocurred: \`\`\`${error.stack}\`\`\``;
+      this.owners.forEach((owner) => {
+        owner.send(messageToOwner);
+      });
+    }
   }
 }
 

@@ -31,7 +31,7 @@ if (process.argv[2] === '--debug') {
 }
 
 client.on('error', (error) => {
-  logger.error(error);
+  client.handleError(error);
 });
 
 client.on('guildCreate', (guild) => {
@@ -71,7 +71,7 @@ client.on('messageReactionAdd', async(reaction, user) => {
         logger.warn(`I don't have enough permissions in ${guild.name} to remove reactions!`);
         return;
       }
-      logger.error(error);
+      client.handleError(error, guild);
     });
 
   if (reaction.emoji.name !== SUPPORT_EMOJI) {
@@ -113,7 +113,7 @@ client.on('messageReactionAdd', async(reaction, user) => {
       }
 
       logger.error(`There was an error creating the support channel for ${user.username} from ${guild.name}.`);
-      logger.error(error);
+      client.handleError(error, guild, `There was an error creating the support channel for ${user.username} from ${guild.name}.`);
     });
 });
 
@@ -154,11 +154,13 @@ client.on('ready', () => {
           });
         })
         .catch((error) => {
-          logger.error(error);
+          logger.fatal('Could not set database as provider!');
+          logger.fatal(error);
         });
     })
     .catch((error) => {
-      logger.error(error);
+      logger.fatal('Could not load the database!');
+      logger.fatal(error);
     });
 });
 

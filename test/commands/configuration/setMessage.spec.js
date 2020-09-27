@@ -90,6 +90,7 @@ describe('Commands - SetMessage', () => {
 
         messageMock.channel.messages.fetch.mockClear();
         logger.error.mockClear();
+        clientMock.handleError.mockClear();
         messageMock.channel.messages.fetch.mockRejectedValue(error);
         command = new SetMessageCommand(clientMock);
       });
@@ -105,6 +106,7 @@ describe('Commands - SetMessage', () => {
 
       it('should errorLog with error if the rejected error was not unknown channel discord error.', () => {
         error.name = 'Unknown Error';
+        clientMock.handleError.mockImplementationOnce((error) => logger.error(error));
         expect.assertions(2);
         return command.run(messageMock, [messageMock.id])
           .then(() => {
