@@ -1,4 +1,5 @@
 import { SQLiteProvider } from 'discord.js-commando';
+import { MessageAttachment } from 'discord.js';
 import { open } from 'sqlite';
 import sqlite3 from 'sqlite3';
 import logger from '@greencoast/logger';
@@ -6,7 +7,7 @@ import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
 import { SUPPORT_EMOJI, guildSettingKeys, discordErrors } from './common/constants';
 import { isThisTheDiscordError } from './common/utils/helpers';
-import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory } from './common/utils/data';
+import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory, getImageFile } from './common/utils/data';
 import ExtendedClient from './classes/extensions/ExtendedClient';
 
 const client = new ExtendedClient({
@@ -20,7 +21,8 @@ client.registry
   .registerGroups([
     ['misc', 'Miscellaneous Commands'],
     ['owner-only', 'Owner-only Commands'],
-    ['configuration', 'Configuration Commands']
+    ['configuration', 'Configuration Commands'],
+    ['tickets', 'Tickets Commands']
   ])
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
@@ -87,11 +89,14 @@ client.on('messageReactionAdd', async(reaction, user) => {
   }
 
   client.createSupportChannel(guild, user)
-    .then(({ channel, staffRoleID }) => {
+    .then(async({ channel, staffRoleID }) => {
       const newTickets = [...currentTickets, { channel: channel.id, user: user.id }];
       client.provider.set(guild.id, guildSettingKeys.currentTickets, newTickets);
 
-      channel.send(`Please hang tight ${user.username}, <@&${staffRoleID}> will get to you shortly.`);
+      const imagePath = await getImageFile(guild);
+      const imageAttachment = imagePath ? new MessageAttachment(imagePath) : null;
+
+      channel.send(`Please hang tight ${user.username}, <@&${staffRoleID}> will get to you shortly.`, imageAttachment);
       logger.info(`Support channel ${channel.name} has been created in ${guild.name}.`);
 
       client.updatePresence();

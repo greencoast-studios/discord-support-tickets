@@ -2,6 +2,8 @@
 
 This command will set the staff role that should be pinged at the start of every ticket channel.
 
+> **Note**: Updating the staff role with ongoing tickets will not update the role for those channels. This is intended because an ongoing ticket already has mentioned the staff role that will assist the user.
+
 ## :question: Can Be Used By
 
 Can be used by members with the **MANAGE_ROLES** permission.

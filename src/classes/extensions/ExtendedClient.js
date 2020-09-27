@@ -63,7 +63,7 @@ class ExtendedClient extends CommandoClient {
       }, {
         id: this.user.id,
         type: 'member',
-        allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS)
+        allow: new Permissions().add(...SUPPORT_CHANNEL_PERMISSIONS, 'MANAGE_CHANNELS')
       });
 
       guild.channels.create(`ticket-${user.username}`, {

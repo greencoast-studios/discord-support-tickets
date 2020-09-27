@@ -9,7 +9,8 @@ export const clientMock = {
       send: jest.fn()
     }
   ],
-  handleError: jest.fn()
+  handleError: jest.fn(),
+  updatePresence: jest.fn()
 };
 
 export const guildMock = {
@@ -51,7 +52,8 @@ export const channelMock = {
   name: 'name',
   id: '123',
   manageable: true,
-  viewable: true
+  viewable: true,
+  delete: jest.fn(() => Promise.resolve(channelMock))
 };
 
 export const roleMock = {
