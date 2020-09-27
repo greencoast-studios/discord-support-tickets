@@ -39,3 +39,9 @@ export const activityType = {
 export const SUPPORT_CHANNEL_PERMISSIONS = ['VIEW_CHANNEL', 'SEND_MESSAGES', 'READ_MESSAGE_HISTORY', 'EMBED_LINKS', 'ATTACH_FILES', 'USE_EXTERNAL_EMOJIS'];
 
 export const SUPPORT_EMOJI = '❗';
+
+export const MESSAGE_EMBED = {
+  color: '#43aa8b',
+  thumbnail: 'https://i.imgur.com/Tqnk48j.png',
+  issuesURL: 'https://github.com/greencoast-studios/discord-support-tickets/issues'
+};
