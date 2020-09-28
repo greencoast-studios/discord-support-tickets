@@ -55,14 +55,28 @@ describe('Commands - Finish', () => {
 
   describe('Executed in ticket channel', () => {
     beforeAll(() => {
-      clientMock.provider.get.mockReturnValue([
-        { channel: messageMock.channel.id }
-      ]);
+      clientMock.provider.get.mockImplementation((guild, key) => {
+        if (key === guildSettingKeys.currentTickets) {
+          return [
+            { channel: messageMock.channel.id }
+          ];
+        }
+        if (key === guildSettingKeys.log) {
+          return true;
+        }
+
+        return null;
+      });
       messageMock.guild.channels.cache.find.mockReturnValue(channelMock);
       serializeChannel.mockResolvedValue('message content');
       saveChannelLog.mockResolvedValue();
     });
     
+    beforeEach(() => {
+      saveChannelLog.mockClear();
+      serializeChannel.mockClear();
+    });
+
     it('should reject if no channel was found in handleFinish.', () => {
       messageMock.guild.channels.cache.find.mockReturnValueOnce(null);
       expect.assertions(1);
@@ -85,6 +99,30 @@ describe('Commands - Finish', () => {
 
     it('should return a Promise if all is good.', () => {
       expect(command.run(messageMock)).toBeInstanceOf(Promise);
+    });
+
+    it('should not serialize channel or save channel log if logging was disabled.', () => {
+      const mockedImplementation = (guild, key) => {
+        if (key === guildSettingKeys.currentTickets) {
+          return [
+            { channel: messageMock.channel.id }
+          ];
+        }
+        if (key === guildSettingKeys.log) {
+          return false;
+        }
+
+        return null;
+      };
+      // Twice since it gets executed 2 times per command run.
+      clientMock.provider.get.mockImplementationOnce(mockedImplementation);
+      clientMock.provider.get.mockImplementationOnce(mockedImplementation);
+
+      return command.run(messageMock)
+        .then(() => {
+          expect(saveChannelLog.mock.calls.length).toBe(0);
+          expect(serializeChannel.mock.calls.length).toBe(0);
+        });
     });
 
     it('should log that the channel was deleted.', () => {
