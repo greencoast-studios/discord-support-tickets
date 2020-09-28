@@ -6,6 +6,7 @@ import logger from '@greencoast/logger';
 export const dataFolder = path.join(__dirname, '../../../data');
 export const imageFolder = path.join(dataFolder, 'images');
 export const dbFilePath = path.join(__dirname, '../../../data/guild-data.sqlite');
+export const logFolder = path.join(__dirname, '../../../log');
 
 export const dbFileExists = () => {
   return fs.existsSync(dbFilePath);
@@ -13,6 +14,22 @@ export const dbFileExists = () => {
 
 export const imageDirectoryExists = () => {
   return fs.existsSync(imageFolder);
+};
+
+export const guildLogDirectoryExists = (guild) => {
+  return new Promise((resolve, reject) => {
+    fs.access(path.join(logFolder, guild.id), fs.constants.F_OK, (error) => {
+      if (error) {
+        if (error.code === 'ENOENT') {
+          resolve(false);
+          return;
+        }
+        reject(error);
+        return;
+      }
+      resolve(true);
+    });
+  });
 };
 
 export const createDatabaseFile = () => {
@@ -25,6 +42,18 @@ export const createDatabaseFile = () => {
 
 export const createImageDirectory = () => {
   fs.mkdirSync(imageFolder);
+};
+
+export const createLogDirectoryForGuild = (guild) => {
+  return new Promise((resolve, reject) => {
+    fs.mkdir(path.join(logFolder, guild.id), { recursive: true }, (error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
 };
 
 export const downloadImage = (imageURL) => {
@@ -97,5 +126,25 @@ export const removeImage = (guild) => {
         resolve(true);
       });
     });
+  });
+};
+
+export const saveChannelLog = (content, channel) => {
+  return new Promise((resolve, reject) => {
+    guildLogDirectoryExists(channel.guild)
+      .then(async(exists) => {
+        if (!exists) {
+          await createLogDirectoryForGuild(channel.guild);
+        }
+        fs.writeFile(path.join(logFolder, channel.guild.id, `${Date.now()} - ${channel.name}.log`), content, { encoding: 'utf-8' }, (error) => {
+          if (error) {
+            throw error; // delegate to the promise rejection.
+          }
+          resolve();
+        });
+      })
+      .catch((error) => {
+        reject(error);
+      });
   });
 };
