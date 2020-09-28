@@ -81,10 +81,11 @@ To run the Docker image you will need the following:
 You can run the image with the following command:
 
 ``` text
-docker run -it -e DISCORD_TOKEN="YOUR_DISCORD_TOKEN_HERE" -v "local/folder/for/data":"/opt/app/data" greencoast/discord-support-tickets
+docker run -it -e DISCORD_TOKEN="YOUR_DISCORD_TOKEN_HERE" -v "local/folder/for/data":"/opt/app/data" -v "local/folder/for/log":"/opt/app/log" greencoast/discord-support-tickets
 ```
 
 > Use the `/opt/app/data` volume to save persistent data like guild information database and images.
+> Use the `/opt/app/log` volume to save support channel logs.
 
 #### :floppy_disk: Environment Variables
 
