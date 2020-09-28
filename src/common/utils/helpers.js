@@ -22,7 +22,7 @@ Guild: ${channel.guild.name}
 Date created: ${channel.createdAt.toLocaleString()}
 Date deleted: ${new Date().toLocaleString()}
 Members: ${channel.members.map((m) => m.displayName).join(', ')}
----#########---\n`;
+---#########---\n\n`;
 
       return messages.array().reverse().reduce((text, message) => {
         const messageText = `[${message.createdAt.toLocaleString()}] ${message.member.displayName}: ${message.content}`;
