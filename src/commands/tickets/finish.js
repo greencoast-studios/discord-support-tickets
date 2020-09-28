@@ -24,20 +24,23 @@ class FinishCommand extends CustomCommand {
       throw new Error('I was supposed to find the ticket channel but I could not.');
     }
 
+    const isLoggingEnabled = this.client.provider.get(message.guild, guildSettingKeys.log, false);
     // We have to serialize the channel before removing, otherwise we lose the data we need.
-    const serializedChannel = await serializeChannel(channel);
+    const serializedChannel = isLoggingEnabled ? await serializeChannel(channel) : null;
 
     return channel.delete()
       .then((deleted) => {
         logger.info(`Ticket ${deleted.name} has been finished. Channel removed in ${message.guild.name}.`);
   
-        saveChannelLog(serializedChannel, channel)
-          .then(() => {
-            logger.info(`The log for ${channel.name} from ${channel.guild.name} has been saved.`);
-          })
-          .catch((error) => {
-            this.onError(error, message);
-          });
+        if (serializedChannel) {
+          saveChannelLog(serializedChannel, channel)
+            .then(() => {
+              logger.info(`The log for ${channel.name} from ${channel.guild.name} has been saved.`);
+            })
+            .catch((error) => {
+              this.onError(error, message);
+            });
+        }
 
         const newTickets = currentTickets.filter(({ channel }) => channel !== ticket.channel);
         this.client.provider.set(message.guild, guildSettingKeys.currentTickets, newTickets);

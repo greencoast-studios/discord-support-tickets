@@ -1,6 +1,6 @@
 {
   "name": "discord-support-tickets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A support tickets bot for Discord.",
   "main": "src/app.js",
   "scripts": {
