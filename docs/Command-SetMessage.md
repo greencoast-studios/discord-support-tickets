@@ -1,6 +1,6 @@
 ## :pencil2: Description
 
-This command will set the message that will be used to handle ticket creation.
+This command will set the message that will be used to handle ticket creation. It will react the message with the :heavy_exclamation_mark: emoji. Any user that reacts this message with that reaction will trigger a support channel creation.
 
 ## :question: Can Be Used By
 

@@ -1,6 +1,6 @@
 ## :pencil2: Description
 
-This command will finish the ticket of the channel it was executed in. In other words, it will delete the channel and save a log of the conversation (if enabled) to a text file in the bot's `data` directory.
+This command will finish the ticket of the channel it was executed in. In other words, it will delete the channel and save a log of the conversation (if enabled) to a text file in the bot's `log` directory.
 
 **This command can only be executed from a ticket channel.**
 

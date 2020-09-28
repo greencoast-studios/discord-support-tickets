@@ -1,7 +1,8 @@
 import logger from '@greencoast/logger';
 import CustomCommand from '../../classes/extensions/CustomCommand';
 import { guildSettingKeys, discordErrors } from '../../common/constants';
-import { isThisTheDiscordError } from '../../common/utils/helpers';
+import { isThisTheDiscordError, serializeChannel } from '../../common/utils/helpers';
+import { saveChannelLog } from '../../common/utils/data';
 
 class FinishCommand extends CustomCommand {
   constructor(client) {
@@ -16,19 +17,28 @@ class FinishCommand extends CustomCommand {
     });
   }
 
-  handleFinish(message, ticket, currentTickets) {
+  async handleFinish(message, ticket, currentTickets) {
     const channel = message.guild.channels.cache.find((channel) => channel.id === ticket.channel);
     
     if (!channel) {
       throw new Error('I was supposed to find the ticket channel but I could not.');
     }
 
+    // We have to serialize the channel before removing, otherwise we lose the data we need.
+    const serializedChannel = await serializeChannel(channel);
+
     return channel.delete()
       .then((deleted) => {
         logger.info(`Ticket ${deleted.name} has been finished. Channel removed in ${message.guild.name}.`);
-        
-        // call logging here on deleted
   
+        saveChannelLog(serializedChannel, channel)
+          .then(() => {
+            logger.info(`The log for ${channel.name} from ${channel.guild.name} has been saved.`);
+          })
+          .catch((error) => {
+            this.onError(error, message);
+          });
+
         const newTickets = currentTickets.filter(({ channel }) => channel !== ticket.channel);
         this.client.provider.set(message.guild, guildSettingKeys.currentTickets, newTickets);
         this.client.updatePresence();

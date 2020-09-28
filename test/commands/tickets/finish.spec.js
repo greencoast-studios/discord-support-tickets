@@ -3,14 +3,29 @@ import FinishCommand from '../../../src/commands/tickets/finish';
 import CustomCommand from '../../../src/classes/extensions/CustomCommand';
 import { clientMock, messageMock, channelMock } from '../../../__mocks__/discordMocks';
 import { guildSettingKeys, discordErrors } from '../../../src/common/constants';
+import { serializeChannel } from '../../../src/common/utils/helpers';
+import { saveChannelLog } from '../../../src/common/utils/data';
 
 let command;
 
 jest.mock('@greencoast/logger');
+jest.mock('../../../src/common/utils/helpers', () => {
+  return {
+    ...jest.requireActual('../../../src/common/utils/helpers'),
+    serializeChannel: jest.fn()
+  };
+});
+jest.mock('../../../src/common/utils/data', () => {
+  return {
+    ...jest.requireActual('../../../src/common/utils/data'),
+    saveChannelLog: jest.fn()
+  };
+});
 
 describe('Commands - Finish', () => {
   beforeAll(() => {
     clientMock.provider.get.mockReturnValue([]);
+    command = new FinishCommand(clientMock);
   });
 
   beforeEach(() => {
@@ -44,11 +59,28 @@ describe('Commands - Finish', () => {
         { channel: messageMock.channel.id }
       ]);
       messageMock.guild.channels.cache.find.mockReturnValue(channelMock);
+      serializeChannel.mockResolvedValue('message content');
+      saveChannelLog.mockResolvedValue();
+    });
+    
+    it('should reject if no channel was found in handleFinish.', () => {
+      messageMock.guild.channels.cache.find.mockReturnValueOnce(null);
+      expect.assertions(1);
+
+      return command.run(messageMock)
+        .catch((error) => {
+          expect(error.message).toBe('I was supposed to find the ticket channel but I could not.');
+        });
     });
 
-    it('should throw if no channel was found in handleFinish.', () => {
-      messageMock.guild.channels.cache.find.mockReturnValueOnce(null);
-      expect(() => command.run(messageMock)).toThrowError(new Error('I was supposed to find the ticket channel but I could not.'));
+    it('should reject if serializeChannel rejects.', () => {
+      const expectedError = new Error('serialization error');
+      serializeChannel.mockRejectedValueOnce(expectedError);
+
+      return command.run(messageMock)
+        .catch((rejected) => {
+          expect(rejected).toBe(expectedError);
+        });
     });
 
     it('should return a Promise if all is good.', () => {
@@ -58,8 +90,26 @@ describe('Commands - Finish', () => {
     it('should log that the channel was deleted.', () => {
       return command.run(messageMock)
         .then(() => {
-          expect(logger.info.mock.calls.length).toBe(2);
+          expect(logger.info.mock.calls.length).toBe(3);
           expect(logger.info.mock.calls[1][0]).toBe(`Ticket ${channelMock.name} has been finished. Channel removed in ${messageMock.guild.name}.`);
+        });
+    });
+
+    it('should log that the channel log was saved if successful.', () => {
+      return command.run(messageMock)
+        .then(() => {
+          expect(logger.info.mock.calls.length).toBe(3);
+          expect(logger.info.mock.calls[2][0]).toBe(`The log for ${channelMock.name} from ${channelMock.guild.name} has been saved.`);
+        });
+    });
+
+    it('should reply something wrong happened if the channel save hit an error.', () => {
+      saveChannelLog.mockRejectedValueOnce();
+
+      return command.run(messageMock)
+        .then(() => {
+          expect(messageMock.reply.mock.calls.length).toBe(1);
+          expect(messageMock.reply.mock.calls[0][0]).toBe('Something wrong happened when executing this command.');
         });
     });
 

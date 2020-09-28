@@ -43,13 +43,15 @@ export const guildMock = {
   name: 'guildName'
 };
 
+export const memberMock = {
+  displayName: 'member name'
+};
+
 export const messageMock = {
   reply: jest.fn(),
   id: '123',
   content: 'content',
-  member: {
-    displayName: 'user'
-  },
+  member: memberMock,
   guild: guildMock,
   say: jest.fn(),
   channel: {
@@ -59,7 +61,8 @@ export const messageMock = {
     }
   },
   react: jest.fn(() => Promise.resolve()),
-  embed: jest.fn()
+  embed: jest.fn(),
+  createdAt: new Date(1601255082895) // "9/27/2020, 8:04:42 PM"
 };
 
 export const channelMock = {
@@ -67,7 +70,18 @@ export const channelMock = {
   id: '123',
   manageable: true,
   viewable: true,
-  delete: jest.fn(() => Promise.resolve(channelMock))
+  delete: jest.fn(() => Promise.resolve(channelMock)),
+  messages: {
+    fetch: jest.fn(() => Promise.resolve({
+      array: () => [messageMock, messageMock, messageMock]
+    }))
+  },
+  parent: {
+    name: 'parent name'
+  },
+  guild: guildMock,
+  createdAt: new Date(1601255082895), // "9/27/2020, 8:04:42 PM"
+  members: [memberMock, memberMock]
 };
 
 export const roleMock = {

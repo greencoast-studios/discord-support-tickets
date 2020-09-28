@@ -2,6 +2,8 @@
 
 This command will toggle the channel logging functionality. When enabled, the bot will save a text file containing the conversation of the created support channel.
 
+Channel logs are saved in `/log/guild_id/timestamp - channel_name.log`.
+
 ## :question: Can Be Used By
 
 Can be used only by the owner.

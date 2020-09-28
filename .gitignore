@@ -111,3 +111,5 @@ config/settings.json
 
 # Data folder
 data
+
+# Log folder
