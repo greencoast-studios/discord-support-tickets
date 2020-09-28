@@ -18,7 +18,7 @@ Can be used by anyone.
 
 Run this command with the following message:
 
-``` tex
+``` text
 $ping <text>
 ```
 
