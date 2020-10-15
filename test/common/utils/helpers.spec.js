@@ -1,4 +1,4 @@
-import { parseMention, isThisTheDiscordError, serializeChannel } from '../../../src/common/utils/helpers';
+import { parseMention, isThisTheDiscordError, serializeChannel, getTemplateAppliedMessage } from '../../../src/common/utils/helpers';
 import { messageMock, channelMock } from '../../../__mocks__/discordMocks';
 import { discordErrors } from '../../../src/common/constants';
 
@@ -80,6 +80,29 @@ describe('Utils - Helpers', () => {
           expect(lines[7]).toBe(`Members: ${channelMock.members.map((m) => m.displayName).join(', ')}`);
           expect(lines[8]).toBe('---#########---');
         });
+    });
+  });
+
+  describe('getTemplateAppliedMessage()', () => {
+    const options = {
+      tickets: 1,
+      guilds: 5
+    };
+
+    it('should return a string.', () => {
+      expect(typeof getTemplateAppliedMessage('', options) === 'string').toBe(true);
+    });
+
+    it('should apply {tickets} to the message.', () => {
+      expect(getTemplateAppliedMessage('T:{tickets}-{tickets}', options)).toBe('T:1-1');
+    });
+
+    it('should apply {guilds} to the message.', () => {
+      expect(getTemplateAppliedMessage('G:{guilds}-{guilds}', options)).toBe('G:5-5');
+    });
+
+    it('should apply multiple different templates.', () => {
+      expect(getTemplateAppliedMessage('ALL:{guilds}-{tickets}', options)).toBe('ALL:5-1');
     });
   });
 });
