@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { SQLiteProvider } from 'discord.js-commando';
 import { MessageAttachment } from 'discord.js';
 import { open } from 'sqlite';
@@ -6,7 +7,7 @@ import logger from '@greencoast/logger';
 import path from 'path';
 import { discordToken, prefix, ownerID, inviteURL } from './common/settings';
 import { SUPPORT_EMOJI, guildSettingKeys, discordErrors } from './common/constants';
-import { isThisTheDiscordError } from './common/utils/helpers';
+import { isThisTheDiscordError, getTemplateAppliedMessage } from './common/utils/helpers';
 import { dbFilePath, dbFileExists, createDatabaseFile, imageDirectoryExists, createImageDirectory, getImageFile } from './common/utils/data';
 import ExtendedClient from './classes/extensions/ExtendedClient';
 
@@ -96,7 +97,18 @@ client.on('messageReactionAdd', async(reaction, user) => {
       const imagePath = await getImageFile(guild);
       const imageAttachment = imagePath ? new MessageAttachment(imagePath) : null;
 
-      channel.send(`Please hang tight ${user.username}, <@&${staffRoleID}> will get to you shortly.`, imageAttachment);
+      let pingerMessage = client.provider.get(guild, guildSettingKeys.pingerMessage, null);
+
+      if (!pingerMessage) {
+        pingerMessage = `Please hang tight ${user.username}, <@&${staffRoleID}> will get to you shortly.`;
+      } else {
+        pingerMessage = getTemplateAppliedMessage(pingerMessage, {
+          user_mention: `<@!${user.id}>`,
+          staff_mention: `<@&${staffRoleID}>`
+        });
+      }
+
+      channel.send(pingerMessage, imageAttachment);
       logger.info(`Support channel ${channel.name} has been created in ${guild.name}.`);
 
       client.updatePresence();
