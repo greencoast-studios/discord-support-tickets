@@ -3,12 +3,21 @@ import { Permissions } from 'discord.js';
 import logger from '@greencoast/logger';
 import ExtendedClient from '../../../src/classes/extensions/ExtendedClient';
 import { guildMock, userMock, channelMock } from '../../../__mocks__/discordMocks';
-import { guildSettingKeys, SUPPORT_CHANNEL_PERMISSIONS } from '../../../src/common/constants';
+import { guildSettingKeys, SUPPORT_CHANNEL_PERMISSIONS, globalSettingKeys } from '../../../src/common/constants';
 
 jest.mock('@greencoast/logger');
 jest.mock('discord.js-commando', () => ({
   CommandoClient: jest.fn()
 }));
+
+const dbMock = {
+  global: {
+    [globalSettingKeys.presence]: null
+  },
+  [guildMock.id]: {
+    [guildSettingKeys.currentTickets]: [1, 2, 3]
+  }
+};
 
 // Have to mock the client here for the time being. Implementing a manual mock in __mocks__ may be a better idea.
 const client = new ExtendedClient();
@@ -23,7 +32,9 @@ client.guilds = {
   }
 };
 client.provider = {
-  get: jest.fn()
+  get: jest.fn((guild, key) => {
+    return dbMock[guild === 'global' ? 'global' : guild.id][key];
+  })
 };
 client.owners = [
   {
@@ -45,10 +56,6 @@ describe('Classes - Extensions - ExtendedClient', () => {
   });
 
   describe('updatePresence()', () => {
-    beforeAll(() => {
-      client.provider.get.mockReturnValue(['one item']);
-    });
-
     it('should return a Promise.', () => {
       expect(client.updatePresence()).toBeInstanceOf(Promise);
     });
@@ -56,7 +63,7 @@ describe('Classes - Extensions - ExtendedClient', () => {
     it('should should set the correct presence if client has more other than 1 guild.', () => {
       return client.updatePresence()
         .then(() => {
-          const presenceMessage = '3 tickets open across 3 servers!';
+          const presenceMessage = '9 tickets open across 3 servers!';
 
           expect(logger.info.mock.calls.length).toBe(1);
           expect(logger.info.mock.calls[0][0]).toBe(`Presence updated to: ${presenceMessage}`);
@@ -65,6 +72,7 @@ describe('Classes - Extensions - ExtendedClient', () => {
 
     it('should should set the correct presence if client has only 1 guild.', () => {
       client.guilds.cache.array.mockReturnValueOnce([guildMock]);
+      client.guilds.cache.array.mockReturnValueOnce([guildMock]);
 
       return client.updatePresence()
         .then(() => {
@@ -72,6 +80,21 @@ describe('Classes - Extensions - ExtendedClient', () => {
 
           expect(logger.info.mock.calls.length).toBe(1);
           expect(logger.info.mock.calls[0][0]).toBe(`Presence updated to: ${presenceMessage}`);
+        });
+    });
+
+    it('should set the correct presence if db contains presence template.', () => {
+      const old = dbMock.global[globalSettingKeys.presence];
+      dbMock.global[globalSettingKeys.presence] = '{tickets} in {guilds}';
+
+      return client.updatePresence()
+        .then(() => {
+          const presenceMessage = '9 in 3';
+
+          expect(logger.info.mock.calls.length).toBe(1);
+          expect(logger.info.mock.calls[0][0]).toBe(`Presence updated to: ${presenceMessage}`);
+
+          dbMock.global[globalSettingKeys.presence] = old;
         });
     });
 

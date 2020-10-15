@@ -1,7 +1,8 @@
 import { CommandoClient } from 'discord.js-commando';
 import { Permissions } from 'discord.js';
 import logger from '@greencoast/logger';
-import { presenceStatus, activityType, guildSettingKeys, SUPPORT_CHANNEL_PERMISSIONS } from '../../common/constants';
+import { presenceStatus, activityType, guildSettingKeys, SUPPORT_CHANNEL_PERMISSIONS, globalSettingKeys } from '../../common/constants';
+import { getTemplateAppliedMessage } from '../../common/utils/helpers';
 
 class ExtendedClient extends CommandoClient {
   updatePresence() {
@@ -9,10 +10,19 @@ class ExtendedClient extends CommandoClient {
     const numberOfTickets = this.guilds.cache.reduce((total, guild) => {
       return total + this.provider.get(guild, guildSettingKeys.currentTickets, []).length;
     }, 0);
+      
+    let presenceMessage = this.provider.get('global', globalSettingKeys.presence, null);
 
-    const presenceMessage = numberOfGuilds === 1 ?
-      `${numberOfTickets} tickets open!` :
-      `${numberOfTickets} tickets open across ${numberOfGuilds} servers!`;
+    if (!presenceMessage) {
+      presenceMessage = numberOfGuilds === 1 ?
+        `${numberOfTickets} tickets open!` :
+        `${numberOfTickets} tickets open across ${numberOfGuilds} servers!`;
+    } else {
+      presenceMessage = getTemplateAppliedMessage(presenceMessage, {
+        tickets: numberOfTickets,
+        guilds: numberOfGuilds
+      });
+    }
 
     return this.user.setPresence({
       status: presenceStatus.online,

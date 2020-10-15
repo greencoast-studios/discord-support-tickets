@@ -30,3 +30,9 @@ Members: ${channel.members.map((m) => m.displayName).join(', ')}
       }, initialText);
     });
 };
+
+export const getTemplateAppliedMessage = (message, options) => {
+  return Object.keys(options).reduce((text, key) => {
+    return text.replace(new RegExp(`{${key}}`, 'gi'), options[key]);
+  }, message);
+};
