@@ -4,7 +4,8 @@ export const guildSettingKeys = {
   channelCategory: 'channel-category',
   staffRole: 'staff-role',
   ticketMessage: 'ticket-message',
-  currentTickets: 'current-tickets'
+  currentTickets: 'current-tickets',
+  pingerMessage: 'pinger-message'
 };
 
 export const globalSettingKeys = {
