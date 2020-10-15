@@ -83,6 +83,21 @@ describe('Classes - Extensions - ExtendedClient', () => {
         });
     });
 
+    it('should set the correct presence if db contains presence template.', () => {
+      const old = dbMock.global[globalSettingKeys.presence];
+      dbMock.global[globalSettingKeys.presence] = '{tickets} in {guilds}';
+
+      return client.updatePresence()
+        .then(() => {
+          const presenceMessage = '9 in 3';
+
+          expect(logger.info.mock.calls.length).toBe(1);
+          expect(logger.info.mock.calls[0][0]).toBe(`Presence updated to: ${presenceMessage}`);
+
+          dbMock.global[globalSettingKeys.presence] = old;
+        });
+    });
+
     it('should log an error when rejected by setPresence().', () => {
       const errorToReject = new Error();
       client.user.setPresence.mockRejectedValueOnce(errorToReject);
