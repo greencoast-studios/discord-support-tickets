@@ -18,14 +18,14 @@ class PresenceCommand extends CustomCommand {
   }
 
   handleUpdate(message, updated) {
-    this.client.provider.set('global', globalSettingKeys.presence, updated)
+    return this.client.provider.set('global', globalSettingKeys.presence, updated)
       .then(() => {
         message.reply('Presence has been updated!');
         logger.info(`Presence template has been set to: ${updated}`);
         this.client.updatePresence();
       })
       .catch((error) => {
-        throw error;
+        this.onError(error, message);
       });
   }
 
@@ -37,7 +37,7 @@ class PresenceCommand extends CustomCommand {
       return;
     }
 
-    this.handleUpdate(message, updated);
+    return this.handleUpdate(message, updated);
   }
 }
 
