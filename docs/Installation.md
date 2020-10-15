@@ -84,8 +84,14 @@ You can run the image with the following command:
 docker run -it -e DISCORD_TOKEN="YOUR_DISCORD_TOKEN_HERE" -v "local/folder/for/data":"/opt/app/data" -v "local/folder/for/log":"/opt/app/log" greencoast/discord-support-tickets
 ```
 
-> Use the `/opt/app/data` volume to save persistent data like guild information database and images.
-> Use the `/opt/app/log` volume to save support channel logs.
+### :open_file_folder: Volumes
+
+You may use the following volumes:
+
+| **Volume:**     | **Description:**                                                                               |
+|-----------------|------------------------------------------------------------------------------------------------|
+| `/opt/app/data` | Volume where the persistent data will be saved, such as guild information database and images. |
+| `/opt/app/log`  | Volume where the support channel logs will be saved.                                           |
 
 #### :floppy_disk: Environment Variables
 
