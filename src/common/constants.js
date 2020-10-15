@@ -7,6 +7,10 @@ export const guildSettingKeys = {
   currentTickets: 'current-tickets'
 };
 
+export const globalSettingKeys = {
+  presence: 'presence'
+};
+
 export const discordErrors = {
   unknownMessage: {
     name: 'DiscordAPIError',
