@@ -8,7 +8,7 @@ This command will finish the ticket of the channel it was executed in. In other 
 
 Can be used by anyone that has access to the channel it was executed in. This has the following implications:
 
-1. It can be run by anyone anywhere. It will, however, not do anything if it wasn't run in a ticket channel.
+1. It can be run by anyone anywhere. It will, however, do nothing if it wasn't run in a ticket channel.
 2. If it's run from a ticket channel, everyone who has access to it can execute it. This implicitly means that only the staff role and the ticket requester can use it.
 
 ## :balloon: Usage

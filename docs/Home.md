@@ -13,7 +13,7 @@ In order to have this bot work, you'll need to execute a few commands prior to h
 3. [Add an image that will be sent on the first message of the created channel](https://github.com/greencoast-studios/discord-support-tickets/wiki/Command-Image)
 4. [Set up the message that will be reacted and will serve as a ticket creator](https://github.com/greencoast-studios/discord-support-tickets/wiki/Command-SetMessage)
 
-Additionally, you can use the following commands for more customization:
+Additionally, you can use the following commands for further customization:
 
 1. [Enable error reporting to the bot's owner](https://github.com/greencoast-studios/discord-support-tickets/wiki/Command-Report)
 2. [Enable support channel logging on finish](https://github.com/greencoast-studios/discord-support-tickets/wiki/Command-Log)

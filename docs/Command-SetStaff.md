@@ -18,7 +18,7 @@ $setcategory <role_mention>
 
 ### :pushpin: Arguments
 
-1. **\<role_mention\>**: A mention to the role that will used.
+1. **\<role_mention\>**: a mention to the role that will used.
 
 ## :information_source: Other Information
 
