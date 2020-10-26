@@ -33,7 +33,7 @@ This will set the bot's presence to: `2 tickets in 3 servers` if the bot current
 
 ### :pushpin: Arguments
 
-1. **\<text\>**: The text that will be used as the bot's presence.
+1. **\<text\>**: the text that will be used as the bot's presence.
 
 ## :information_source: Other Information
 

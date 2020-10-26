@@ -16,7 +16,7 @@ This script will do the same as `npm test` but with the difference that `console
 
 ### npm run test:once
 
-This script will start `jest` in normal mode, which means that it will close after all tests have been run. This one is ideal for CI.
+This script will start `jest` in normal mode, which means that it will close after all tests have been run. This one is ideal for CI (Continuous Integration).
 
 ### npm run test:once-showlogs
 

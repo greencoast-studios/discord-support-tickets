@@ -16,9 +16,9 @@ $setcategory <channel_id>
 
 ### :pushpin: Arguments
 
-1. **\<channel_id\>**: The ID of the channel category to be used.
+1. **\<channel_id\>**: the ID of the channel category to be used.
 
-> **Note**: Make sure that this channel category is manageable by the bot, otherwise it won't be able to save it.
+> **Note**: make sure that this channel category is manageable by the bot, otherwise it won't be able to save it.
 
 ## :information_source: Other Information
 
