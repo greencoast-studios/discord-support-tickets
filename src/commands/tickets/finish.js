@@ -58,7 +58,7 @@ class FinishCommand extends CustomCommand {
 
   run(message) {
     super.run(message);
-    const currentTickets = this.client.provider.get(message.guild, guildSettingKeys.currentTickets);
+    const currentTickets = this.client.provider.get(message.guild, guildSettingKeys.currentTickets, []);
     const ticket = currentTickets.find(({ channel }) => channel === message.channel.id);
 
     if (!ticket) {

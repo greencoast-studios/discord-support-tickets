@@ -1,6 +1,6 @@
 {
   "name": "discord-support-tickets",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A support tickets bot for Discord.",
   "main": "src/app.js",
   "scripts": {
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@greencoast/logger": "^1.0.1",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "discord.js": "^12.3.1",
     "discord.js-commando": "github:discordjs/Commando",
     "sqlite": "^4.0.14",

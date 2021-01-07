@@ -5,5 +5,9 @@ config/settings.json
 .github
 .git
 docs
-src
 test
+data
+build
+__mocks__
+coverage
+log
