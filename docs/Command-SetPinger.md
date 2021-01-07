@@ -9,7 +9,7 @@ The message included may have the following templates:
 
 Use these to add this information to the pinger message.
 
-> **Note**: This will message will be set only for the current guild.
+> **Note**: this message will be set only for the current guild.
 
 ## :question: Can Be Used By
 
@@ -33,7 +33,7 @@ This will set the bot's pinger message to: `hey @user, @staff will be there shor
 
 ### :pushpin: Arguments
 
-1. **\<text\>**: The text that will be used as the bot's pinger message for this guild.
+1. **\<text\>**: the text that will be used as the bot's pinger message for this guild.
 
 ## :information_source: Other Information
 

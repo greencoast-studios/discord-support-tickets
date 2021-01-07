@@ -1,4 +1,4 @@
-> This page serves as a template to documentate commands. Remove any blockquotes at the beginning of each section.
+> This page serves as a template to document commands. Remove any blockquotes at the beginning of each section.
 
 ## :pencil2: Description
 
@@ -26,7 +26,7 @@ $ping <text>
 
 > Remove this section if the command does not receive any arguments. Arguments should be listed in ordered lists.
 
-1. **\<text\>**: The text that the bot should repeat.
+1. **\<text\>**: the text that the bot should repeat.
 
 ## :information_source: Other Information
 
