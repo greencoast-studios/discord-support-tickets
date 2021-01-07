@@ -1,6 +1,20 @@
-# Bot needs to be built prior to building this image.
+# Build Stage
+FROM node:12.20.0-alpine3.12 AS build
 
-FROM node:12
+RUN apk add --no-cache git
+
+WORKDIR /opt/app
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+# Bot Image
+FROM node:12.20.0-alpine3.12
 
 ARG DATE_CREATED
 ARG VERSION
@@ -14,9 +28,12 @@ LABEL org.opencontainers.image.description="A support ticket bot for Discord."
 LABEL org.opencontainers.image.documentation="https://github.com/greencoast-studios/discord-support-tickets/wiki"
 LABEL org.opencontainers.image.source="https://github.com/greencoast-studios/discord-support-tickets"
 
+RUN apk add --no-cache git
+
 WORKDIR /opt/app
 
 COPY package*.json ./
+COPY ./Dockerfile ./README.md ./LICENSE ./
 
 RUN npm ci --only=prod
 
@@ -26,7 +43,7 @@ ENV PREFIX ""
 ENV OWNER_ID ""
 ENV INVITE_URL ""
 
-COPY . .
+COPY --from=build /opt/app/build ./build
 
 VOLUME /opt/app/data /opt/app/log
 
